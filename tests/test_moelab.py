@@ -331,12 +331,19 @@ def test_gate_temperature_touches_explored_tokens_only():
     _, explored = layer._explore(top, layer.epsilon)
 
     delta = (y_hot - y_cold).abs().amax(dim=-1)
-    # Exactly zero, not merely small: an exploited token's gate never sees T.
-    assert delta[~explored].max().item() == 0.0, "temperature leaked outside exploration"
-    # The explored side moves. A handful of tokens draw two outsiders with nearly
-    # equal logits, whose gate the temperature barely shifts, so this is a
-    # majority claim rather than a universal one.
-    assert (delta[explored] > 1e-6).float().mean().item() > 0.95
+    quiet = delta[~explored].max().item()
+    loud = delta[explored].median().item()
+
+    # An exploited token's gate never sees T, so `quiet` is zero in exact
+    # arithmetic -- but not reliably zero in floating point. `_dispatch` sorts
+    # assignments by `expert * 2 - gate`, so changing the explored tokens' gates
+    # permutes the whole assignment array, and index_add_ then accumulates an
+    # exploited token's k contributions in a different order. Addition is not
+    # associative, so that perturbs them at rounding scale. Whether it does so at
+    # all is platform-dependent: exactly 0.0 on an M-series CPU, ~1e-8 elsewhere.
+    # The claim worth pinning is the separation, which a real leak would destroy.
+    assert quiet < 1e-5, f"temperature leaked outside exploration: {quiet}"
+    assert loud > 1e3 * max(quiet, 1e-12), (quiet, loud)
     assert 0.4 < explored.float().mean().item() < 0.6  # the test is not vacuous
 
 
