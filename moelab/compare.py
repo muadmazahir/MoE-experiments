@@ -182,12 +182,14 @@ def format_report(result: dict) -> str:
             f"{_fmt(ept, epts, '.2f'):>13}"
         )
     lines += [
-        "           ('experts/tok' is measured at evaluation and sets inference "
-        "cost. It is exactly k unless a strategy",
-        "            changes the routing rule itself, in which case that "
-        "strategy's trained artefact is not interchangeable",
-        "            with the others. 'vs top-k' >1.0 prices dense passes, <1.0 "
-        "means capacity dropped work rather than served it.)",
+        "           ('experts/tok' is expert evaluations per token at eval, so it "
+        "sets inference cost. It is k minus whatever",
+        "            capacity dropped -- so below k for any run with a capacity "
+        "factor. Only a strategy that changes the routing",
+        "            rule itself moves it on its own, and that strategy's trained "
+        "artefact is then not interchangeable with the",
+        "            others. 'vs top-k' >1.0 prices dense passes, <1.0 means "
+        "capacity dropped work rather than served it.)",
         "",
         "-" * w,
         "PER-LAYER EXPERT LOAD  (each glyph column is one expert; flat = balanced)"

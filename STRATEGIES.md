@@ -373,7 +373,10 @@ about, and a rising threshold makes those the majority.
   the routing rule, not a training aid, so it stays in force at evaluation —
   scoring it under top-$k$ would measure a rule it never trained on. Its inference
   cost is therefore variable per token rather than exactly $k$, and the
-  `experts/tok` column in the report exists to make that visible. Quality and
+  `experts/tok` column in the report exists to make that visible. Note that
+  column counts evaluations *after* capacity dropping, so with a capacity factor
+  set every strategy reads below $k$; what distinguishes this one is that it
+  moves on its own, without anything being dropped. Quality and
   collapse remain comparable across strategies; the compute axis, for this row
   only, does not.
 - **It answers a different question.** If what you want to know is "which
