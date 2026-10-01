@@ -6,11 +6,11 @@ control is for and why; this module documents only how it is implemented.
 
   ``mode``              "topk" or "dense" (every expert on every token).
   ``epsilon``           exploration rate -- see ``_explore``.
-  ``gate_temperature``  softens the gate of explored tokens -- see ``forward``.
+  ``gate_temperature``  softens the gate of explored tokens -- see ``_gate``.
   ``surrogate_alpha``   straight-through estimate of the experts top-k skipped,
-                        see ``_surrogate_scale``.
+                        see ``_apply_surrogate`` and ``_surrogate_scale``.
   ``conf_threshold``    tokens whose top-k probability mass falls below this go
-                        through every expert instead -- see ``forward``.
+                        through every expert instead -- see ``_topk_assignments``.
   ``tau_mult``          replaces top-k selection entirely with "every expert
                         above a probability threshold" -- see
                         ``_threshold_assignments``. Unlike the controls above it
@@ -136,7 +136,7 @@ class MoELayer(nn.Module):
 
         Replacing all k slots rather than one also keeps the tempered gate
         clean -- an exploring token has no exploited slot left in its gate
-        softmax, so ``forward`` never has to mix tempered and untempered logits
+        softmax, so ``_gate`` never has to mix tempered and untempered logits
         inside a single normaliser.
 
         The implementation ranks uniform noise with the top-k entries pushed to
@@ -337,6 +337,86 @@ class MoELayer(nn.Module):
         )
         return y, counts
 
+    def _gate(
+        self, logits: Tensor, probs: Tensor, idx: Tensor, explored: Tensor | None
+    ) -> Tensor:
+        """Gate weights for the k selected experts of every token, shape (N, k).
+
+        The temperature softens the gate of *explored* tokens only. Every
+        exploited token is gated at T = 1, which is exactly the regime the model
+        is evaluated and deployed in, so the temperature opens no train/deploy
+        gap and never needs annealing away.
+        """
+        tempered = explored is not None and self.gate_temperature != 1.0
+        temps: Tensor | float = 1.0
+        if tempered:
+            one = probs.new_ones(())
+            temps = torch.where(  # (N, 1), broadcast over the k slots
+                explored.unsqueeze(-1), one * self.gate_temperature, one
+            )
+        if self.gate_norm == "renorm":
+            # softmax over the selected logits; at T = 1 this is identical to
+            # renormalising the selected probabilities.
+            return F.softmax(logits.gather(-1, idx) / temps, dim=-1)
+        # Switch-style: the router's own probability, so absolute confidence
+        # scales the expert's contribution.
+        gate = F.softmax(logits / temps, dim=-1) if tempered else probs
+        return gate.gather(-1, idx)
+
+    def _topk_assignments(
+        self, logits: Tensor, probs: Tensor
+    ) -> tuple[Tensor, Tensor, Tensor, Tensor, int]:
+        """Top-k selection with the training-time aids layered on top of it.
+
+        Returns the flat (token, expert, gate) triples ``_dispatch`` consumes,
+        the (N, k) selected experts, and how many tokens fell back to dense.
+        """
+        top_p, idx = probs.topk(self.k, dim=-1)  # (N, k)
+        # Confidence-gated dense fallback. A token whose top-k experts hold less
+        # than `conf_threshold` of the router's probability mass is one the
+        # router cannot yet tell apart, so it is sent through every expert
+        # rather than committed to a guess. The threshold anneals down, so
+        # tokens graduate to sparse routing as the router sharpens; at 0 nothing
+        # falls back and this is ordinary top-k, which is what evaluation always
+        # sees.
+        #
+        # The useful range is (k/E, 1]: the top k of any distribution hold at
+        # least a uniform k/E share, so a threshold at or below that can never
+        # fire.
+        go_dense = None
+        if self.training and self.conf_threshold > 0.0:
+            go_dense = top_p.sum(-1) < self.conf_threshold
+        explored = None
+        if self.training and self.epsilon > 0.0:
+            idx, explored = self._explore(idx, self.epsilon)
+        gate = self._gate(logits, probs, idx, explored)
+        token_of, flat_expert, flat_gate = self._assignments(probs, idx, gate, go_dense)
+        n_dense = 0 if go_dense is None else int(go_dense.sum())
+        return token_of, flat_expert, flat_gate, idx, n_dense
+
+    def _apply_surrogate(self, y: Tensor, probs: Tensor, idx: Tensor) -> Tensor:
+        """Straight-through estimate of the experts top-k skipped.
+
+        The value cancels exactly, so the forward pass stays plain top-k and the
+        deployed model is unchanged, but the router logits of *every* expert --
+        including the E - k never evaluated -- now receive gradient through the
+        scale.
+        """
+        if not (self.training and self.surrogate_alpha > 0.0):
+            return y
+        s = self.surrogate_alpha * self._surrogate_scale(probs, idx)
+        return y + y.detach() * (s - s.detach())
+
+    def _aux_loss(self, f: Tensor, probs: Tensor) -> Tensor:
+        """Switch/ST-MoE load-balancing loss: alpha * E * sum_i f_i * P_i.
+
+        Both f and P sum to 1, so the term bottoms out at 1 when the load and
+        the router mass are spread evenly across experts.
+        """
+        if self.aux_alpha <= 0.0:
+            return probs.new_zeros(())
+        return self.aux_alpha * self.num_experts * torch.sum(f * probs.mean(dim=0))
+
     # -- forward ---------------------------------------------------------
 
     def forward(self, x: Tensor) -> tuple[Tensor, Tensor, RouterStats]:
@@ -356,82 +436,26 @@ class MoELayer(nn.Module):
             n_dense = n
             # In dense mode f_i is uniform by construction, so the aux loss has
             # nothing to correct; it is computed from the router probabilities
-            # alone below and is anyway zero-weighted for strategies 2 and 3.
+            # alone.
             f = torch.full_like(probs[0], 1.0 / self.num_experts)
         else:
-            idx = None  # set only on the top-k path
-            n_dense = 0
             if self.tau_mult > 0.0:
                 token_of, flat_expert, flat_gate = self._threshold_assignments(
                     logits, probs
                 )
+                idx, n_dense = None, 0
             else:
-                top_p, idx = probs.topk(self.k, dim=-1)  # (N, k)
-                # Confidence-gated dense fallback. A token whose top-k experts
-                # hold less than `conf_threshold` of the router's probability
-                # mass is one the router cannot yet tell apart, so it is sent
-                # through every expert rather than committed to a guess. The
-                # threshold anneals down, so tokens graduate to sparse routing
-                # as the router sharpens; at 0 nothing falls back and this is
-                # ordinary top-k, which is what evaluation always sees.
-                #
-                # The useful range is (k/E, 1]: the top k of any distribution
-                # hold at least a uniform k/E share, so a threshold at or below
-                # that can never fire.
-                go_dense = None
-                if self.training and self.conf_threshold > 0.0:
-                    go_dense = top_p.sum(-1) < self.conf_threshold
-                explored = None
-                if self.training and self.epsilon > 0.0:
-                    idx, explored = self._explore(idx, self.epsilon)
-                # The temperature softens the gate of *explored* tokens only.
-                # Every exploited token is gated at T = 1, which is exactly the
-                # regime the model is evaluated and deployed in, so the
-                # temperature opens no train/deploy gap and never needs
-                # annealing away.
-                tempered = explored is not None and self.gate_temperature != 1.0
-                temps: Tensor | float = 1.0
-                if tempered:
-                    one = probs.new_ones(())
-                    temps = torch.where(  # (N, 1), broadcast over the k slots
-                        explored.unsqueeze(-1), one * self.gate_temperature, one
-                    )
-                if self.gate_norm == "renorm":
-                    # softmax over the selected logits; at T = 1 this is
-                    # identical to renormalising the selected probabilities.
-                    gate = F.softmax(logits.gather(-1, idx) / temps, dim=-1)
-                else:
-                    # Switch-style: the router's own probability, so absolute
-                    # confidence scales the expert's contribution.
-                    gate = F.softmax(logits / temps, dim=-1) if tempered else probs
-                    gate = gate.gather(-1, idx)
-                token_of, flat_expert, flat_gate = self._assignments(
-                    probs, idx, gate, go_dense
+                token_of, flat_expert, flat_gate, idx, n_dense = self._topk_assignments(
+                    logits, probs
                 )
-                n_dense = 0 if go_dense is None else int(go_dense.sum())
-
             y, counts, expert_token_pairs, dropped = self._dispatch(
                 flat, token_of, flat_expert, flat_gate
             )
-            if self.training and self.surrogate_alpha > 0.0 and idx is not None:
-                # Straight-through: the value cancels exactly, so the forward
-                # pass stays plain top-k and the deployed model is unchanged,
-                # but the router logits of *every* expert -- including the E - k
-                # never evaluated -- now receive gradient through the scale.
-                s = self.surrogate_alpha * self._surrogate_scale(probs, idx)
-                y = y + y.detach() * (s - s.detach())
+            if idx is not None:  # the surrogate is defined for top-k selection only
+                y = self._apply_surrogate(y, probs, idx)
             # Denominator is the assignments actually made, not n*k, since both
             # the dense fallback and threshold routing vary the count per token.
             f = counts.to(probs.dtype) / max(flat_expert.numel(), 1)
-
-        aux_loss = flat.new_zeros(())
-        if self.aux_alpha > 0.0:
-            # Switch/ST-MoE load-balancing loss: alpha * E * sum_i f_i * P_i.
-            # Both f and P sum to 1, so the term bottoms out at 1 when the load
-            # and the router mass are spread evenly across experts.
-            aux_loss = (
-                self.aux_alpha * self.num_experts * torch.sum(f * probs.mean(dim=0))
-            )
 
         stats = RouterStats(
             counts=counts.detach(),
@@ -441,4 +465,4 @@ class MoELayer(nn.Module):
             dropped_pairs=dropped,
             mode="dense" if dense else "topk",
         )
-        return y.reshape(shape), aux_loss, stats
+        return y.reshape(shape), self._aux_loss(f, probs), stats
