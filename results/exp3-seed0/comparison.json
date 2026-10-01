@@ -1,0 +1,2288 @@
+{
+  "runs": [
+    {
+      "strategy": "none",
+      "label": "0. Control: nothing (top-k, no aux loss)",
+      "description": "sparse top-k from step 0 with no collapse mitigation at all",
+      "config": {
+        "model": {
+          "vocab_size": 65,
+          "block_size": 128,
+          "d_model": 128,
+          "n_head": 4,
+          "n_layer": 4,
+          "num_experts": 8,
+          "k": 2,
+          "d_hidden": 256,
+          "dropout": 0.0,
+          "aux_alpha": 0.0,
+          "capacity_factor": 1.25,
+          "gate_norm": "auto"
+        },
+        "train": {
+          "steps": 1000,
+          "batch_size": 32,
+          "block_size": 128,
+          "lr": 0.0003,
+          "lr_warmup_frac": 0.05,
+          "lr_min_frac": 0.1,
+          "weight_decay": 0.1,
+          "grad_clip": 1.0,
+          "eval_every": 250,
+          "eval_batches": 20,
+          "seed": 0,
+          "device": "cuda",
+          "equalize": "steps"
+        },
+        "strategy": {
+          "name": "none",
+          "label": "0. Control: nothing (top-k, no aux loss)",
+          "description": "sparse top-k from step 0 with no collapse mitigation at all",
+          "aux_alpha": 0.0,
+          "accum_steps": 1,
+          "dense_warmup_frac": 0.0,
+          "eps_start": 0.0,
+          "eps_end": 0.0,
+          "eps_decay_frac": 1.0,
+          "surrogate_alpha": 0.0,
+          "gate_temp": 1.0,
+          "conf_start": 0.0,
+          "tau_start": 0.0,
+          "tau_end": 0.0
+        }
+      },
+      "params": {
+        "total_params": 2402688,
+        "expert_params": 2109440,
+        "active_params_per_token": 820608,
+        "sparsity": 0.6584625219753876
+      },
+      "final": {
+        "val_loss": 2.165870428085327,
+        "val_ppl": 8.722190653357677,
+        "drop_rate": 0.17013702392578126,
+        "experts_per_token": 1.6597259521484375,
+        "collapse": {
+          "load": [
+            0.088528,
+            0.184418,
+            0.085785,
+            0.086865,
+            0.207234,
+            0.068634,
+            0.173648,
+            0.104887
+          ],
+          "entropy_norm": 0.9617379791404266,
+          "max_load": 0.20723419189453124,
+          "dead_experts": 0,
+          "effective_experts": 7.388153994851823,
+          "cv": 0.40559546768151883,
+          "gini": 0.21750907897949223
+        },
+        "per_layer_collapse": [
+          {
+            "load": [
+              0.086932,
+              0.158582,
+              0.099622,
+              0.147186,
+              0.12533,
+              0.079889,
+              0.12746,
+              0.175
+            ],
+            "entropy_norm": 0.9838728819828303,
+            "max_load": 0.175,
+            "dead_experts": 0,
+            "effective_experts": 7.7361654313043875,
+            "cv": 0.2569720307281876,
+            "gini": 0.14610595703124973
+          },
+          {
+            "load": [
+              0.051202,
+              0.026593,
+              0.16239,
+              0.06106,
+              0.167834,
+              0.06308,
+              0.307123,
+              0.160718
+            ],
+            "entropy_norm": 0.8871413320635139,
+            "max_load": 0.307122802734375,
+            "dead_experts": 0,
+            "effective_experts": 6.32657198703942,
+            "cv": 0.6970210645043065,
+            "gini": 0.36856231689453134
+          },
+          {
+            "load": [
+              0.178027,
+              0.275574,
+              0.045178,
+              0.063135,
+              0.22323,
+              0.061438,
+              0.111115,
+              0.042303
+            ],
+            "entropy_norm": 0.8948765036824219,
+            "max_load": 0.27557373046875,
+            "dead_experts": 0,
+            "effective_experts": 6.429156684809828,
+            "cv": 0.6717377637828391,
+            "gini": 0.3651123046875
+          },
+          {
+            "load": [
+              0.037952,
+              0.276923,
+              0.03595,
+              0.07608,
+              0.312543,
+              0.070129,
+              0.148895,
+              0.041528
+            ],
+            "entropy_norm": 0.8467708562581114,
+            "max_load": 0.312542724609375,
+            "dead_experts": 0,
+            "effective_experts": 5.81715025422623,
+            "cv": 0.832838728672415,
+            "gini": 0.4323822021484376
+          }
+        ]
+      },
+      "efficiency": {
+        "wall_s": 38.21795154499978,
+        "opt_steps": 1000,
+        "micro_steps": 1000,
+        "tokens_seen": 4096000,
+        "dense_micro_steps": 0,
+        "train_expert_pairs": 25471719,
+        "train_dropped_pairs": 7296281,
+        "train_drop_rate": 0.22266482543945312,
+        "train_flops": 18386669666304,
+        "sparse_baseline_train_flops": 21255684096000,
+        "inference_flops_per_token": 1729792,
+        "dense_equivalent_flops_per_token": 4875520
+      },
+      "history": [
+        {
+          "micro_step": 250,
+          "opt_step": 250,
+          "mode": "topk",
+          "epsilon": 0.0,
+          "gate_temp": 1.0,
+          "conf_threshold": 0.0,
+          "tau_mult": 0.0,
+          "train_dense_frac": 0.0,
+          "train_experts_per_token": 1.421193603515625,
+          "train_loss": 2.4051411151885986,
+          "aux_loss": 0.0,
+          "val_loss": 2.4270431995391846,
+          "val_ppl": 11.325345736803563,
+          "tokens_seen": 1024000,
+          "train_flops": 4381688070144,
+          "expert_pairs": 5821209,
+          "wall_s": 10.126038966999658,
+          "eval_entropy_norm": 0.9389543782227044,
+          "eval_effective_experts": 7.0462864954756155,
+          "eval_max_load": 0.2591156005859375,
+          "eval_dead_experts": 0,
+          "eval_drop_rate": 0.23087005615234374,
+          "eval_cv": 0.5279362679176184,
+          "train_entropy_norm": 0.9411058079319053,
+          "per_layer_entropy_norm": [
+            0.9667489861048242,
+            0.912609972393531,
+            0.8878347514964483,
+            0.668992141359071
+          ],
+          "per_layer_dead": [
+            0,
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "micro_step": 500,
+          "opt_step": 500,
+          "mode": "topk",
+          "epsilon": 0.0,
+          "gate_temp": 1.0,
+          "conf_threshold": 0.0,
+          "tau_mult": 0.0,
+          "train_dense_frac": 0.0,
+          "train_experts_per_token": 1.5694169921875,
+          "train_loss": 2.2714977264404297,
+          "aux_loss": 0.0,
+          "val_loss": 2.2926599979400635,
+          "val_ppl": 9.901239961560508,
+          "tokens_seen": 2048000,
+          "train_flops": 9002106617856,
+          "expert_pairs": 12249541,
+          "wall_s": 19.685396517999834,
+          "eval_entropy_norm": 0.9527545326667095,
+          "eval_effective_experts": 7.2514203081406565,
+          "eval_max_load": 0.239056396484375,
+          "eval_dead_experts": 0,
+          "eval_drop_rate": 0.1926910400390625,
+          "eval_cv": 0.45651125184722796,
+          "train_entropy_norm": 0.9477540013638734,
+          "per_layer_entropy_norm": [
+            0.9820008366832733,
+            0.9031744980779248,
+            0.9087906160293747,
+            0.767686802373007
+          ],
+          "per_layer_dead": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "micro_step": 750,
+          "opt_step": 750,
+          "mode": "topk",
+          "epsilon": 0.0,
+          "gate_temp": 1.0,
+          "conf_threshold": 0.0,
+          "tau_mult": 0.0,
+          "train_dense_frac": 0.0,
+          "train_experts_per_token": 1.60520751953125,
+          "train_loss": 2.1826553344726562,
+          "aux_loss": 0.0,
+          "val_loss": 2.20410418510437,
+          "val_ppl": 9.062129939675689,
+          "tokens_seen": 3072000,
+          "train_flops": 13680169844736,
+          "expert_pairs": 18824471,
+          "wall_s": 28.689666721999856,
+          "eval_entropy_norm": 0.9569859201948365,
+          "eval_effective_experts": 7.31550652849972,
+          "eval_max_load": 0.218157958984375,
+          "eval_dead_experts": 0,
+          "eval_drop_rate": 0.182684326171875,
+          "eval_cv": 0.4305731733261469,
+          "train_entropy_norm": 0.9537071026811849,
+          "per_layer_entropy_norm": [
+            0.9837067567597332,
+            0.887232393892851,
+            0.891712763382938,
+            0.8197850919210874
+          ],
+          "per_layer_dead": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "micro_step": 1000,
+          "opt_step": 1000,
+          "mode": "topk",
+          "epsilon": 0.0,
+          "gate_temp": 1.0,
+          "conf_threshold": 0.0,
+          "tau_mult": 0.0,
+          "train_dense_frac": 0.0,
+          "train_experts_per_token": 1.62286328125,
+          "train_loss": 2.090190887451172,
+          "aux_loss": 0.0,
+          "val_loss": 2.165870428085327,
+          "val_ppl": 8.722190653357677,
+          "tokens_seen": 4096000,
+          "train_flops": 18386669666304,
+          "expert_pairs": 25471719,
+          "wall_s": 38.00058832400009,
+          "eval_entropy_norm": 0.9617379791404266,
+          "eval_effective_experts": 7.388153994851823,
+          "eval_max_load": 0.20723419189453124,
+          "eval_dead_experts": 0,
+          "eval_drop_rate": 0.17013702392578126,
+          "eval_cv": 0.40559546768151883,
+          "train_entropy_norm": 0.9584001753141365,
+          "per_layer_entropy_norm": [
+            0.9838728819828303,
+            0.8871413320635139,
+            0.8948765036824219,
+            0.8467708562581114
+          ],
+          "per_layer_dead": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "seed": 0
+    },
+    {
+      "strategy": "aux",
+      "label": "1. Auxiliary load-balancing loss",
+      "description": "top-k from step 0, aux loss alpha=0.01 added to the task loss",
+      "config": {
+        "model": {
+          "vocab_size": 65,
+          "block_size": 128,
+          "d_model": 128,
+          "n_head": 4,
+          "n_layer": 4,
+          "num_experts": 8,
+          "k": 2,
+          "d_hidden": 256,
+          "dropout": 0.0,
+          "aux_alpha": 0.01,
+          "capacity_factor": 1.25,
+          "gate_norm": "auto"
+        },
+        "train": {
+          "steps": 1000,
+          "batch_size": 32,
+          "block_size": 128,
+          "lr": 0.0003,
+          "lr_warmup_frac": 0.05,
+          "lr_min_frac": 0.1,
+          "weight_decay": 0.1,
+          "grad_clip": 1.0,
+          "eval_every": 250,
+          "eval_batches": 20,
+          "seed": 0,
+          "device": "cuda",
+          "equalize": "steps"
+        },
+        "strategy": {
+          "name": "aux",
+          "label": "1. Auxiliary load-balancing loss",
+          "description": "top-k from step 0, aux loss alpha=0.01 added to the task loss",
+          "aux_alpha": 0.01,
+          "accum_steps": 1,
+          "dense_warmup_frac": 0.0,
+          "eps_start": 0.0,
+          "eps_end": 0.0,
+          "eps_decay_frac": 1.0,
+          "surrogate_alpha": 0.0,
+          "gate_temp": 1.0,
+          "conf_start": 0.0,
+          "tau_start": 0.0,
+          "tau_end": 0.0
+        }
+      },
+      "params": {
+        "total_params": 2402688,
+        "expert_params": 2109440,
+        "active_params_per_token": 820608,
+        "sparsity": 0.6584625219753876
+      },
+      "final": {
+        "val_loss": 2.105234146118164,
+        "val_ppl": 8.209024895899207,
+        "drop_rate": 0.0017303466796875,
+        "experts_per_token": 1.996539306640625,
+        "collapse": {
+          "load": [
+            0.131871,
+            0.10834,
+            0.115079,
+            0.118558,
+            0.118692,
+            0.137448,
+            0.137433,
+            0.132579
+          ],
+          "entropy_norm": 0.9983129127050925,
+          "max_load": 0.1374481201171875,
+          "dead_experts": 0,
+          "effective_experts": 7.971983577089582,
+          "cv": 0.0834961086964733,
+          "gini": 0.04634590148925799
+        },
+        "per_layer_collapse": [
+          {
+            "load": [
+              0.113177,
+              0.109564,
+              0.10307,
+              0.108453,
+              0.133557,
+              0.157025,
+              0.155701,
+              0.119452
+            ],
+            "entropy_norm": 0.9940062005675284,
+            "max_load": 0.157025146484375,
+            "dead_experts": 0,
+            "effective_experts": 7.900908762993395,
+            "cv": 0.16012235515414314,
+            "gini": 0.08652191162109357
+          },
+          {
+            "load": [
+              0.132776,
+              0.111499,
+              0.120929,
+              0.118195,
+              0.109619,
+              0.131702,
+              0.153223,
+              0.122058
+            ],
+            "entropy_norm": 0.99739407973453,
+            "max_load": 0.15322265625,
+            "dead_experts": 0,
+            "effective_experts": 7.956766373418257,
+            "cv": 0.10553801063794496,
+            "gini": 0.05665740966796884
+          },
+          {
+            "load": [
+              0.133417,
+              0.129541,
+              0.103467,
+              0.124701,
+              0.102887,
+              0.132159,
+              0.116895,
+              0.156934
+            ],
+            "entropy_norm": 0.9958386171191297,
+            "max_load": 0.15693359375,
+            "dead_experts": 0,
+            "effective_experts": 7.931071840476031,
+            "cv": 0.13208868368886803,
+            "gini": 0.07233886718750004
+          },
+          {
+            "load": [
+              0.148114,
+              0.082758,
+              0.132849,
+              0.122882,
+              0.128705,
+              0.128906,
+              0.123914,
+              0.131873
+            ],
+            "entropy_norm": 0.9948571836290097,
+            "max_load": 0.148114013671875,
+            "dead_experts": 0,
+            "effective_experts": 7.914902348053511,
+            "cv": 0.14034733804937796,
+            "gini": 0.06642608642578107
+          }
+        ]
+      },
+      "efficiency": {
+        "wall_s": 38.788302955999825,
+        "opt_steps": 1000,
+        "micro_steps": 1000,
+        "tokens_seen": 4096000,
+        "dense_micro_steps": 0,
+        "train_expert_pairs": 32404404,
+        "train_dropped_pairs": 363596,
+        "train_drop_rate": 0.0110960693359375,
+        "train_flops": 21112712331264,
+        "sparse_baseline_train_flops": 21255684096000,
+        "inference_flops_per_token": 1729792,
+        "dense_equivalent_flops_per_token": 4875520
+      },
+      "history": [
+        {
+          "micro_step": 250,
+          "opt_step": 250,
+          "mode": "topk",
+          "epsilon": 0.0,
+          "gate_temp": 1.0,
+          "conf_threshold": 0.0,
+          "tau_mult": 0.0,
+          "train_dense_frac": 0.0,
+          "train_experts_per_token": 1.927643798828125,
+          "train_loss": 2.4002978801727295,
+          "aux_loss": 0.04003234580159187,
+          "val_loss": 2.420254707336426,
+          "val_ppl": 11.248724082576945,
+          "tokens_seen": 1024000,
+          "train_flops": 5197383204864,
+          "expert_pairs": 7895629,
+          "wall_s": 10.052657909000118,
+          "eval_entropy_norm": 0.9992552010669025,
+          "eval_effective_experts": 7.987619463017675,
+          "eval_max_load": 0.13364105224609374,
+          "eval_dead_experts": 0,
+          "eval_drop_rate": 2.288818359375e-05,
+          "eval_cv": 0.055451854966969825,
+          "train_entropy_norm": 0.999249740880913,
+          "per_layer_entropy_norm": [
+            0.9980546776992791,
+            0.9961068220121596,
+            0.9990480583693655,
+            0.9963139927333778
+          ],
+          "per_layer_dead": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "micro_step": 500,
+          "opt_step": 500,
+          "mode": "topk",
+          "epsilon": 0.0,
+          "gate_temp": 1.0,
+          "conf_threshold": 0.0,
+          "tau_mult": 0.0,
+          "train_dense_frac": 0.0,
+          "train_experts_per_token": 1.995099609375,
+          "train_loss": 2.2528116703033447,
+          "aux_loss": 0.04010304808616638,
+          "val_loss": 2.2600173950195312,
+          "val_ppl": 9.583255866237469,
+          "tokens_seen": 2048000,
+          "train_flops": 10503411597312,
+          "expert_pairs": 16067557,
+          "wall_s": 19.771793461000016,
+          "eval_entropy_norm": 0.9993238577603896,
+          "eval_effective_experts": 7.988759917530805,
+          "eval_max_load": 0.13308563232421874,
+          "eval_dead_experts": 0,
+          "eval_drop_rate": 1.52587890625e-05,
+          "eval_cv": 0.052673854714857624,
+          "train_entropy_norm": 0.9995661944384737,
+          "per_layer_entropy_norm": [
+            0.9984771510251989,
+            0.9996112073977852,
+            0.9986957665604199,
+            0.9929653902432336
+          ],
+          "per_layer_dead": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "micro_step": 750,
+          "opt_step": 750,
+          "mode": "topk",
+          "epsilon": 0.0,
+          "gate_temp": 1.0,
+          "conf_threshold": 0.0,
+          "tau_mult": 0.0,
+          "train_dense_frac": 0.0,
+          "train_experts_per_token": 1.99649853515625,
+          "train_loss": 2.128948211669922,
+          "aux_loss": 0.04033365473151207,
+          "val_loss": 2.148625373840332,
+          "val_ppl": 8.573065533494526,
+          "tokens_seen": 3072000,
+          "train_flops": 15811693117440,
+          "expert_pairs": 24245215,
+          "wall_s": 29.55952306600011,
+          "eval_entropy_norm": 0.9986052403854518,
+          "eval_effective_experts": 7.976831046278453,
+          "eval_max_load": 0.14207763671875,
+          "eval_dead_experts": 0,
+          "eval_drop_rate": 0.00357818603515625,
+          "eval_cv": 0.07626823785640076,
+          "train_entropy_norm": 0.9987691583414489,
+          "per_layer_entropy_norm": [
+            0.9959245926911878,
+            0.9961023886193328,
+            0.998672436302786,
+            0.9938912305740552
+          ],
+          "per_layer_dead": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "micro_step": 1000,
+          "opt_step": 1000,
+          "mode": "topk",
+          "epsilon": 0.0,
+          "gate_temp": 1.0,
+          "conf_threshold": 0.0,
+          "tau_mult": 0.0,
+          "train_dense_frac": 0.0,
+          "train_experts_per_token": 1.991989501953125,
+          "train_loss": 2.025430679321289,
+          "aux_loss": 0.040122244507074356,
+          "val_loss": 2.105234146118164,
+          "val_ppl": 8.209024895899207,
+          "tokens_seen": 4096000,
+          "train_flops": 21112712331264,
+          "expert_pairs": 32404404,
+          "wall_s": 38.57970161799949,
+          "eval_entropy_norm": 0.9983129127050925,
+          "eval_effective_experts": 7.971983577089582,
+          "eval_max_load": 0.1374481201171875,
+          "eval_dead_experts": 0,
+          "eval_drop_rate": 0.0017303466796875,
+          "eval_cv": 0.0834961086964733,
+          "train_entropy_norm": 0.9979533525349428,
+          "per_layer_entropy_norm": [
+            0.9940062005675284,
+            0.99739407973453,
+            0.9958386171191297,
+            0.9948571836290097
+          ],
+          "per_layer_dead": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "seed": 0
+    },
+    {
+      "strategy": "explore",
+      "label": "2. Epsilon-greedy exploration outside the top-k",
+      "description": "no aux loss; sparse top-k from step 0, epsilon annealed 0.6->0.01 over 60% of the remaining steps; an exploring token is routed to k distinct experts drawn from outside its top-k and gated at a fixed temperature 4",
+      "config": {
+        "model": {
+          "vocab_size": 65,
+          "block_size": 128,
+          "d_model": 128,
+          "n_head": 4,
+          "n_layer": 4,
+          "num_experts": 8,
+          "k": 2,
+          "d_hidden": 256,
+          "dropout": 0.0,
+          "aux_alpha": 0.0,
+          "capacity_factor": 1.25,
+          "gate_norm": "auto"
+        },
+        "train": {
+          "steps": 1000,
+          "batch_size": 32,
+          "block_size": 128,
+          "lr": 0.0003,
+          "lr_warmup_frac": 0.05,
+          "lr_min_frac": 0.1,
+          "weight_decay": 0.1,
+          "grad_clip": 1.0,
+          "eval_every": 250,
+          "eval_batches": 20,
+          "seed": 0,
+          "device": "cuda",
+          "equalize": "steps"
+        },
+        "strategy": {
+          "name": "explore",
+          "label": "2. Epsilon-greedy exploration outside the top-k",
+          "description": "no aux loss; sparse top-k from step 0, epsilon annealed 0.6->0.01 over 60% of the remaining steps; an exploring token is routed to k distinct experts drawn from outside its top-k and gated at a fixed temperature 4",
+          "aux_alpha": 0.0,
+          "accum_steps": 1,
+          "dense_warmup_frac": 0.0,
+          "eps_start": 0.6,
+          "eps_end": 0.01,
+          "eps_decay_frac": 0.6,
+          "surrogate_alpha": 0.0,
+          "gate_temp": 4.0,
+          "conf_start": 0.0,
+          "tau_start": 0.0,
+          "tau_end": 0.0
+        }
+      },
+      "params": {
+        "total_params": 2402688,
+        "expert_params": 2109440,
+        "active_params_per_token": 820608,
+        "sparsity": 0.6584625219753876
+      },
+      "final": {
+        "val_loss": 2.183060884475708,
+        "val_ppl": 8.873425263112138,
+        "drop_rate": 0.0518402099609375,
+        "experts_per_token": 1.896319580078125,
+        "collapse": {
+          "load": [
+            0.11104,
+            0.143028,
+            0.17793,
+            0.088893,
+            0.139139,
+            0.092807,
+            0.137207,
+            0.109956
+          ],
+          "entropy_norm": 0.9881707287515868,
+          "max_load": 0.1779296875,
+          "dead_experts": 0,
+          "effective_experts": 7.8056143531571935,
+          "cv": 0.2233702263225947,
+          "gini": 0.12350959777832049
+        },
+        "per_layer_collapse": [
+          {
+            "load": [
+              0.065344,
+              0.142151,
+              0.154059,
+              0.152252,
+              0.077972,
+              0.101282,
+              0.162299,
+              0.144641
+            ],
+            "entropy_norm": 0.9790807557610082,
+            "max_load": 0.162298583984375,
+            "dead_experts": 0,
+            "effective_experts": 7.659457786452733,
+            "cv": 0.28271778902354544,
+            "gini": 0.1518142700195313
+          },
+          {
+            "load": [
+              0.165259,
+              0.161731,
+              0.157208,
+              0.054419,
+              0.203418,
+              0.043646,
+              0.157733,
+              0.056586
+            ],
+            "entropy_norm": 0.9405795949059859,
+            "max_load": 0.20341796875,
+            "dead_experts": 0,
+            "effective_experts": 7.0701400085638895,
+            "cv": 0.4691164364641746,
+            "gini": 0.24857025146484402
+          },
+          {
+            "load": [
+              0.067108,
+              0.181335,
+              0.211896,
+              0.078314,
+              0.157031,
+              0.054736,
+              0.092346,
+              0.157233
+            ],
+            "entropy_norm": 0.9520678617032802,
+            "max_load": 0.211895751953125,
+            "dead_experts": 0,
+            "effective_experts": 7.241073451030298,
+            "cv": 0.44112387343165804,
+            "gini": 0.24658660888671857
+          },
+          {
+            "load": [
+              0.146448,
+              0.086896,
+              0.188556,
+              0.070587,
+              0.118134,
+              0.171564,
+              0.13645,
+              0.081366
+            ],
+            "entropy_norm": 0.9742994858222375,
+            "max_load": 0.188555908203125,
+            "dead_experts": 0,
+            "effective_experts": 7.583681932976889,
+            "cv": 0.3244985646082397,
+            "gini": 0.18421783447265616
+          }
+        ]
+      },
+      "efficiency": {
+        "wall_s": 39.06364437800039,
+        "opt_steps": 1000,
+        "micro_steps": 1000,
+        "tokens_seen": 4096000,
+        "dense_micro_steps": 0,
+        "train_expert_pairs": 30852459,
+        "train_dropped_pairs": 1915541,
+        "train_drop_rate": 0.05845767211914062,
+        "train_flops": 20502462726144,
+        "sparse_baseline_train_flops": 21255684096000,
+        "inference_flops_per_token": 1729792,
+        "dense_equivalent_flops_per_token": 4875520
+      },
+      "history": [
+        {
+          "micro_step": 250,
+          "opt_step": 250,
+          "mode": "topk",
+          "epsilon": 0.3551,
+          "gate_temp": 4.0,
+          "conf_threshold": 0.0,
+          "tau_mult": 0.0,
+          "train_dense_frac": 0.0,
+          "train_experts_per_token": 1.946283447265625,
+          "train_loss": 2.4702954292297363,
+          "aux_loss": 0.0,
+          "val_loss": 2.4610249996185303,
+          "val_ppl": 11.716815118124876,
+          "tokens_seen": 1024000,
+          "train_flops": 5227404460032,
+          "expert_pairs": 7971977,
+          "wall_s": 9.495582423999622,
+          "eval_entropy_norm": 0.9880589614433894,
+          "eval_effective_experts": 7.803800433150641,
+          "eval_max_load": 0.1810455322265625,
+          "eval_dead_experts": 0,
+          "eval_drop_rate": 0.10193023681640626,
+          "eval_cv": 0.22654592749394015,
+          "train_entropy_norm": 0.997362483726217,
+          "per_layer_entropy_norm": [
+            0.9732333858643202,
+            0.9521330894470492,
+            0.9020336795682125,
+            0.9595590205891805
+          ],
+          "per_layer_dead": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "micro_step": 500,
+          "opt_step": 500,
+          "mode": "topk",
+          "epsilon": 0.1093,
+          "gate_temp": 4.0,
+          "conf_threshold": 0.0,
+          "tau_mult": 0.0,
+          "train_dense_frac": 0.0,
+          "train_experts_per_token": 1.9015302734375,
+          "train_loss": 2.339862823486328,
+          "aux_loss": 0.0,
+          "val_loss": 2.339157819747925,
+          "val_ppl": 10.372497370810555,
+          "tokens_seen": 2048000,
+          "train_flops": 10382728888320,
+          "expert_pairs": 15760645,
+          "wall_s": 19.333273447000465,
+          "eval_entropy_norm": 0.9787490463762516,
+          "eval_effective_experts": 7.6541763418545505,
+          "eval_max_load": 0.20188140869140625,
+          "eval_dead_experts": 0,
+          "eval_drop_rate": 0.10544891357421875,
+          "eval_cv": 0.30359948870182096,
+          "train_entropy_norm": 0.9909398129458112,
+          "per_layer_entropy_norm": [
+            0.9748614537125506,
+            0.9326706863624092,
+            0.926206487055255,
+            0.9366261508202197
+          ],
+          "per_layer_dead": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "micro_step": 750,
+          "opt_step": 750,
+          "mode": "topk",
+          "epsilon": 0.01,
+          "gate_temp": 4.0,
+          "conf_threshold": 0.0,
+          "tau_mult": 0.0,
+          "train_dense_frac": 0.0,
+          "train_experts_per_token": 1.818447509765625,
+          "train_loss": 2.232163429260254,
+          "aux_loss": 0.0,
+          "val_loss": 2.2311151027679443,
+          "val_ppl": 9.310242170018784,
+          "tokens_seen": 3072000,
+          "train_flops": 15404239159296,
+          "expert_pairs": 23209006,
+          "wall_s": 29.179602477000117,
+          "eval_entropy_norm": 0.9833450460769647,
+          "eval_effective_experts": 7.727678844187371,
+          "eval_max_load": 0.18806304931640624,
+          "eval_dead_experts": 0,
+          "eval_drop_rate": 0.07354888916015626,
+          "eval_cv": 0.26498533792296586,
+          "train_entropy_norm": 0.9812288688338953,
+          "per_layer_entropy_norm": [
+            0.9773518046419624,
+            0.9395813258941722,
+            0.9283192699770976,
+            0.962965123623226
+          ],
+          "per_layer_dead": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "micro_step": 1000,
+          "opt_step": 1000,
+          "mode": "topk",
+          "epsilon": 0.01,
+          "gate_temp": 4.0,
+          "conf_threshold": 0.0,
+          "tau_mult": 0.0,
+          "train_dense_frac": 0.0,
+          "train_experts_per_token": 1.866077392578125,
+          "train_loss": 2.147130250930786,
+          "aux_loss": 0.0,
+          "val_loss": 2.183060884475708,
+          "val_ppl": 8.873425263112138,
+          "tokens_seen": 4096000,
+          "train_flops": 20502462726144,
+          "expert_pairs": 30852459,
+          "wall_s": 38.78445393400034,
+          "eval_entropy_norm": 0.9881707287515868,
+          "eval_effective_experts": 7.8056143531571935,
+          "eval_max_load": 0.1779296875,
+          "eval_dead_experts": 0,
+          "eval_drop_rate": 0.0518402099609375,
+          "eval_cv": 0.2233702263225947,
+          "train_entropy_norm": 0.9855357337463428,
+          "per_layer_entropy_norm": [
+            0.9790807557610082,
+            0.9405795949059859,
+            0.9520678617032802,
+            0.9742994858222375
+          ],
+          "per_layer_dead": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "seed": 0
+    },
+    {
+      "strategy": "accum",
+      "label": "3. Gradient accumulation x8",
+      "description": "no aux loss; gradients accumulated over 8 micro-batches before each optimiser step",
+      "config": {
+        "model": {
+          "vocab_size": 65,
+          "block_size": 128,
+          "d_model": 128,
+          "n_head": 4,
+          "n_layer": 4,
+          "num_experts": 8,
+          "k": 2,
+          "d_hidden": 256,
+          "dropout": 0.0,
+          "aux_alpha": 0.0,
+          "capacity_factor": 1.25,
+          "gate_norm": "auto"
+        },
+        "train": {
+          "steps": 1000,
+          "batch_size": 32,
+          "block_size": 128,
+          "lr": 0.0003,
+          "lr_warmup_frac": 0.05,
+          "lr_min_frac": 0.1,
+          "weight_decay": 0.1,
+          "grad_clip": 1.0,
+          "eval_every": 250,
+          "eval_batches": 20,
+          "seed": 0,
+          "device": "cuda",
+          "equalize": "steps"
+        },
+        "strategy": {
+          "name": "accum",
+          "label": "3. Gradient accumulation x8",
+          "description": "no aux loss; gradients accumulated over 8 micro-batches before each optimiser step",
+          "aux_alpha": 0.0,
+          "accum_steps": 8,
+          "dense_warmup_frac": 0.0,
+          "eps_start": 0.0,
+          "eps_end": 0.0,
+          "eps_decay_frac": 1.0,
+          "surrogate_alpha": 0.0,
+          "gate_temp": 1.0,
+          "conf_start": 0.0,
+          "tau_start": 0.0,
+          "tau_end": 0.0
+        }
+      },
+      "params": {
+        "total_params": 2402688,
+        "expert_params": 2109440,
+        "active_params_per_token": 820608,
+        "sparsity": 0.6584625219753876
+      },
+      "final": {
+        "val_loss": 1.8839412927627563,
+        "val_ppl": 6.579385110791928,
+        "drop_rate": 0.06488189697265626,
+        "experts_per_token": 1.8702362060546875,
+        "collapse": {
+          "load": [
+            0.076303,
+            0.131354,
+            0.141925,
+            0.116249,
+            0.167477,
+            0.103146,
+            0.145297,
+            0.118248
+          ],
+          "entropy_norm": 0.988986121820929,
+          "max_load": 0.1674774169921875,
+          "dead_experts": 0,
+          "effective_experts": 7.818860484614132,
+          "cv": 0.21003379169921793,
+          "gini": 0.11738853454589826
+        },
+        "per_layer_collapse": [
+          {
+            "load": [
+              0.05495,
+              0.088916,
+              0.140955,
+              0.175079,
+              0.16861,
+              0.115204,
+              0.089709,
+              0.166577
+            ],
+            "entropy_norm": 0.9713378323933219,
+            "max_load": 0.175079345703125,
+            "dead_experts": 0,
+            "effective_experts": 7.537120704684363,
+            "cv": 0.33398678962771605,
+            "gini": 0.1869659423828125
+          },
+          {
+            "load": [
+              0.026282,
+              0.064258,
+              0.183295,
+              0.110968,
+              0.207782,
+              0.138336,
+              0.182397,
+              0.086682
+            ],
+            "entropy_norm": 0.937477779770935,
+            "max_load": 0.207781982421875,
+            "dead_experts": 0,
+            "effective_experts": 7.024684053779497,
+            "cv": 0.4801958987211421,
+            "gini": 0.2725250244140627
+          },
+          {
+            "load": [
+              0.136633,
+              0.158893,
+              0.150482,
+              0.101666,
+              0.13631,
+              0.065375,
+              0.101935,
+              0.148706
+            ],
+            "entropy_norm": 0.9847766519760348,
+            "max_load": 0.158892822265625,
+            "dead_experts": 0,
+            "effective_experts": 7.750717962487338,
+            "cv": 0.24091365023276884,
+            "gini": 0.1299179077148438
+          },
+          {
+            "load": [
+              0.087347,
+              0.213348,
+              0.092969,
+              0.077283,
+              0.157208,
+              0.093671,
+              0.207147,
+              0.071027
+            ],
+            "entropy_norm": 0.9559656745492715,
+            "max_load": 0.213348388671875,
+            "dead_experts": 0,
+            "effective_experts": 7.300002831841339,
+            "cv": 0.44005714850035804,
+            "gini": 0.23198242187499996
+          }
+        ]
+      },
+      "efficiency": {
+        "wall_s": 275.0707651069997,
+        "opt_steps": 1000,
+        "micro_steps": 8000,
+        "tokens_seen": 32768000,
+        "dense_micro_steps": 0,
+        "train_expert_pairs": 227290656,
+        "train_dropped_pairs": 34853344,
+        "train_drop_rate": 0.1329549560546875,
+        "train_flops": 156340580253696,
+        "sparse_baseline_train_flops": 170045472768000,
+        "inference_flops_per_token": 1729792,
+        "dense_equivalent_flops_per_token": 4875520
+      },
+      "history": [
+        {
+          "micro_step": 2000,
+          "opt_step": 250,
+          "mode": "topk",
+          "epsilon": 0.0,
+          "gate_temp": 1.0,
+          "conf_threshold": 0.0,
+          "tau_mult": 0.0,
+          "train_dense_frac": 0.0,
+          "train_experts_per_token": 1.4909389343261719,
+          "train_loss": 2.329101324081421,
+          "aux_loss": 0.0,
+          "val_loss": 2.3292839527130127,
+          "val_ppl": 10.270584675136307,
+          "tokens_seen": 8192000,
+          "train_flops": 35952166305792,
+          "expert_pairs": 48855087,
+          "wall_s": 68.19731300500007,
+          "eval_entropy_norm": 0.9620048937972957,
+          "eval_effective_experts": 7.392255805487979,
+          "eval_max_load": 0.19900665283203126,
+          "eval_dead_experts": 0,
+          "eval_drop_rate": 0.1620941162109375,
+          "eval_cv": 0.38733182394596016,
+          "train_entropy_norm": 0.9559554206532248,
+          "per_layer_entropy_norm": [
+            0.9714835359729423,
+            0.9256129132988622,
+            0.9368728287202425,
+            0.8115568234709571
+          ],
+          "per_layer_dead": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "micro_step": 4000,
+          "opt_step": 500,
+          "mode": "topk",
+          "epsilon": 0.0,
+          "gate_temp": 1.0,
+          "conf_threshold": 0.0,
+          "tau_mult": 0.0,
+          "train_dense_frac": 0.0,
+          "train_experts_per_token": 1.7737901000976561,
+          "train_loss": 2.0417160987854004,
+          "aux_loss": 0.0,
+          "val_loss": 2.0661637783050537,
+          "val_ppl": 7.8944799781938055,
+          "tokens_seen": 16384000,
+          "train_flops": 75548842131456,
+          "expert_pairs": 106978641,
+          "wall_s": 136.83216178800012,
+          "eval_entropy_norm": 0.9879490562004754,
+          "eval_effective_experts": 7.802017144462807,
+          "eval_max_load": 0.15975189208984375,
+          "eval_dead_experts": 0,
+          "eval_drop_rate": 0.07318572998046875,
+          "eval_cv": 0.21708166567782097,
+          "train_entropy_norm": 0.9802008161499642,
+          "per_layer_entropy_norm": [
+            0.9741824902202899,
+            0.9444923686815064,
+            0.9832821737459155,
+            0.9289897888785756
+          ],
+          "per_layer_dead": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "micro_step": 6000,
+          "opt_step": 750,
+          "mode": "topk",
+          "epsilon": 0.0,
+          "gate_temp": 1.0,
+          "conf_threshold": 0.0,
+          "tau_mult": 0.0,
+          "train_dense_frac": 0.0,
+          "train_experts_per_token": 1.8287869262695313,
+          "train_loss": 1.7583070993423462,
+          "aux_loss": 0.0,
+          "val_loss": 1.9375696182250977,
+          "val_ppl": 6.941859084283207,
+          "tokens_seen": 24576000,
+          "train_flops": 115854146666496,
+          "expert_pairs": 166904331,
+          "wall_s": 205.59743747899938,
+          "eval_entropy_norm": 0.9884584561876452,
+          "eval_effective_experts": 7.81028594627998,
+          "eval_max_load": 0.16598052978515626,
+          "eval_dead_experts": 0,
+          "eval_drop_rate": 0.07039031982421876,
+          "eval_cv": 0.21560909775821796,
+          "train_entropy_norm": 0.9854816501727677,
+          "per_layer_entropy_norm": [
+            0.971857210996695,
+            0.9376090354997455,
+            0.9854398511637648,
+            0.9445182608549539
+          ],
+          "per_layer_dead": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "micro_step": 8000,
+          "opt_step": 1000,
+          "mode": "topk",
+          "epsilon": 0.0,
+          "gate_temp": 1.0,
+          "conf_threshold": 0.0,
+          "tau_mult": 0.0,
+          "train_dense_frac": 0.0,
+          "train_experts_per_token": 1.8428443908691405,
+          "train_loss": 1.6794734001159668,
+          "aux_loss": 0.0,
+          "val_loss": 1.8839412927627563,
+          "val_ppl": 6.579385110791928,
+          "tokens_seen": 32768000,
+          "train_flops": 156340580253696,
+          "expert_pairs": 227290656,
+          "wall_s": 274.8558277839993,
+          "eval_entropy_norm": 0.988986121820929,
+          "eval_effective_experts": 7.818860484614132,
+          "eval_max_load": 0.1674774169921875,
+          "eval_dead_experts": 0,
+          "eval_drop_rate": 0.06488189697265626,
+          "eval_cv": 0.21003379169921793,
+          "train_entropy_norm": 0.9864819068533851,
+          "per_layer_entropy_norm": [
+            0.9713378323933219,
+            0.937477779770935,
+            0.9847766519760348,
+            0.9559656745492715
+          ],
+          "per_layer_dead": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "seed": 0
+    },
+    {
+      "strategy": "surrogate",
+      "label": "4. Straight-through estimate of the unevaluated experts",
+      "description": "no aux loss, no exploration; the E-k experts top-k skipped are estimated as c*p_j from a least-squares fit of output against probability over the k that ran, wired in straight-through (alpha=1.0) so the forward pass stays exactly top-k while every router logit receives gradient",
+      "config": {
+        "model": {
+          "vocab_size": 65,
+          "block_size": 128,
+          "d_model": 128,
+          "n_head": 4,
+          "n_layer": 4,
+          "num_experts": 8,
+          "k": 2,
+          "d_hidden": 256,
+          "dropout": 0.0,
+          "aux_alpha": 0.0,
+          "capacity_factor": 1.25,
+          "gate_norm": "auto"
+        },
+        "train": {
+          "steps": 1000,
+          "batch_size": 32,
+          "block_size": 128,
+          "lr": 0.0003,
+          "lr_warmup_frac": 0.05,
+          "lr_min_frac": 0.1,
+          "weight_decay": 0.1,
+          "grad_clip": 1.0,
+          "eval_every": 250,
+          "eval_batches": 20,
+          "seed": 0,
+          "device": "cuda",
+          "equalize": "steps"
+        },
+        "strategy": {
+          "name": "surrogate",
+          "label": "4. Straight-through estimate of the unevaluated experts",
+          "description": "no aux loss, no exploration; the E-k experts top-k skipped are estimated as c*p_j from a least-squares fit of output against probability over the k that ran, wired in straight-through (alpha=1.0) so the forward pass stays exactly top-k while every router logit receives gradient",
+          "aux_alpha": 0.0,
+          "accum_steps": 1,
+          "dense_warmup_frac": 0.0,
+          "eps_start": 0.0,
+          "eps_end": 0.0,
+          "eps_decay_frac": 1.0,
+          "surrogate_alpha": 1.0,
+          "gate_temp": 1.0,
+          "conf_start": 0.0,
+          "tau_start": 0.0,
+          "tau_end": 0.0
+        }
+      },
+      "params": {
+        "total_params": 2402688,
+        "expert_params": 2109440,
+        "active_params_per_token": 820608,
+        "sparsity": 0.6584625219753876
+      },
+      "final": {
+        "val_loss": 2.1779897212982178,
+        "val_ppl": 8.828540580624601,
+        "drop_rate": 0.20450592041015625,
+        "experts_per_token": 1.5909881591796875,
+        "collapse": {
+          "load": [
+            0.138837,
+            0.132973,
+            0.094794,
+            0.172987,
+            0.097244,
+            0.095488,
+            0.083946,
+            0.183731
+          ],
+          "entropy_norm": 0.9807681549966557,
+          "max_load": 0.1837310791015625,
+          "dead_experts": 0,
+          "effective_experts": 7.686380866985136,
+          "cv": 0.28630498100409574,
+          "gini": 0.15690460205078116
+        },
+        "per_layer_collapse": [
+          {
+            "load": [
+              0.087097,
+              0.102081,
+              0.164392,
+              0.151636,
+              0.134662,
+              0.160693,
+              0.037976,
+              0.161462
+            ],
+            "entropy_norm": 0.966983557956142,
+            "max_load": 0.16439208984375,
+            "dead_experts": 0,
+            "effective_experts": 7.4691841815402205,
+            "cv": 0.3405070223049156,
+            "gini": 0.1811935424804687
+          },
+          {
+            "load": [
+              0.058722,
+              0.097949,
+              0.162823,
+              0.109863,
+              0.172546,
+              0.105249,
+              0.150555,
+              0.142291
+            ],
+            "entropy_norm": 0.9785652453505996,
+            "max_load": 0.17254638671875,
+            "dead_experts": 0,
+            "effective_experts": 7.651251447945755,
+            "cv": 0.2882650396653429,
+            "gini": 0.16118621826171875
+          },
+          {
+            "load": [
+              0.324249,
+              0.022711,
+              0.018561,
+              0.363513,
+              0.040009,
+              0.078015,
+              0.125726,
+              0.027216
+            ],
+            "entropy_norm": 0.7596115859211671,
+            "max_load": 0.36351318359375,
+            "dead_experts": 0,
+            "effective_experts": 4.85285837639825,
+            "cv": 1.048330340473399,
+            "gini": 0.5319869995117188
+          },
+          {
+            "load": [
+              0.085278,
+              0.309149,
+              0.033398,
+              0.066937,
+              0.04176,
+              0.037994,
+              0.021527,
+              0.403955
+            ],
+            "entropy_norm": 0.7564826611848436,
+            "max_load": 0.403955078125,
+            "dead_experts": 0,
+            "effective_experts": 4.821386157339481,
+            "cv": 1.0964388401319252,
+            "gini": 0.5278472900390625
+          }
+        ]
+      },
+      "efficiency": {
+        "wall_s": 41.76972834099979,
+        "opt_steps": 1000,
+        "micro_steps": 1000,
+        "tokens_seen": 4096000,
+        "dense_micro_steps": 0,
+        "train_expert_pairs": 24527961,
+        "train_dropped_pairs": 8240039,
+        "train_drop_rate": 0.2514660339355469,
+        "train_flops": 18015568920576,
+        "sparse_baseline_train_flops": 21255684096000,
+        "inference_flops_per_token": 1729792,
+        "dense_equivalent_flops_per_token": 4875520
+      },
+      "history": [
+        {
+          "micro_step": 250,
+          "opt_step": 250,
+          "mode": "topk",
+          "epsilon": 0.0,
+          "gate_temp": 1.0,
+          "conf_threshold": 0.0,
+          "tau_mult": 0.0,
+          "train_dense_frac": 0.0,
+          "train_experts_per_token": 1.439003173828125,
+          "train_loss": 2.4172487258911133,
+          "aux_loss": 0.0,
+          "val_loss": 2.4301466941833496,
+          "val_ppl": 11.360548484154856,
+          "tokens_seen": 1024000,
+          "train_flops": 4410372390912,
+          "expert_pairs": 5894157,
+          "wall_s": 10.07342268299999,
+          "eval_entropy_norm": 0.9657770235378738,
+          "eval_effective_experts": 7.450468100835845,
+          "eval_max_load": 0.19901580810546876,
+          "eval_dead_experts": 0,
+          "eval_drop_rate": 0.25332489013671877,
+          "eval_cv": 0.37305037347041897,
+          "train_entropy_norm": 0.9737797922550792,
+          "per_layer_entropy_norm": [
+            0.9695148886447846,
+            0.9673771575337483,
+            0.6998567014845029,
+            0.6613397956211724
+          ],
+          "per_layer_dead": [
+            0,
+            0,
+            2,
+            1
+          ]
+        },
+        {
+          "micro_step": 500,
+          "opt_step": 500,
+          "mode": "topk",
+          "epsilon": 0.0,
+          "gate_temp": 1.0,
+          "conf_threshold": 0.0,
+          "tau_mult": 0.0,
+          "train_dense_frac": 0.0,
+          "train_experts_per_token": 1.477732177734375,
+          "train_loss": 2.265507221221924,
+          "aux_loss": 0.0,
+          "val_loss": 2.292860746383667,
+          "val_ppl": 9.903227819595564,
+          "tokens_seen": 2048000,
+          "train_flops": 8883122208768,
+          "expert_pairs": 11946948,
+          "wall_s": 20.111980867000057,
+          "eval_entropy_norm": 0.970194453339742,
+          "eval_effective_experts": 7.519221809155902,
+          "eval_max_load": 0.19326934814453126,
+          "eval_dead_experts": 0,
+          "eval_drop_rate": 0.237432861328125,
+          "eval_cv": 0.3519440088245197,
+          "train_entropy_norm": 0.9656877742433273,
+          "per_layer_entropy_norm": [
+            0.9706814367060635,
+            0.9726391574939308,
+            0.7168824040865738,
+            0.708927733181551
+          ],
+          "per_layer_dead": [
+            0,
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "micro_step": 750,
+          "opt_step": 750,
+          "mode": "topk",
+          "epsilon": 0.0,
+          "gate_temp": 1.0,
+          "conf_threshold": 0.0,
+          "tau_mult": 0.0,
+          "train_dense_frac": 0.0,
+          "train_experts_per_token": 1.519889892578125,
+          "train_loss": 2.201563596725464,
+          "aux_loss": 0.0,
+          "val_loss": 2.2108659744262695,
+          "val_ppl": 9.12361378929187,
+          "tokens_seen": 3072000,
+          "train_flops": 13423771779072,
+          "expert_pairs": 18172417,
+          "wall_s": 30.711331008000343,
+          "eval_entropy_norm": 0.9780938189498424,
+          "eval_effective_experts": 7.6437545734957295,
+          "eval_max_load": 0.1843505859375,
+          "eval_dead_experts": 0,
+          "eval_drop_rate": 0.217523193359375,
+          "eval_cv": 0.30333668676271963,
+          "train_entropy_norm": 0.9737344683619532,
+          "per_layer_entropy_norm": [
+            0.9691675430807115,
+            0.9795683885093329,
+            0.7455580789521229,
+            0.7295196460184823
+          ],
+          "per_layer_dead": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "micro_step": 1000,
+          "opt_step": 1000,
+          "mode": "topk",
+          "epsilon": 0.0,
+          "gate_temp": 1.0,
+          "conf_threshold": 0.0,
+          "tau_mult": 0.0,
+          "train_dense_frac": 0.0,
+          "train_experts_per_token": 1.551646484375,
+          "train_loss": 2.1059141159057617,
+          "aux_loss": 0.0,
+          "val_loss": 2.1779897212982178,
+          "val_ppl": 8.828540580624601,
+          "tokens_seen": 4096000,
+          "train_flops": 18015568920576,
+          "expert_pairs": 24527961,
+          "wall_s": 41.566292155000156,
+          "eval_entropy_norm": 0.9807681549966557,
+          "eval_effective_experts": 7.686380866985136,
+          "eval_max_load": 0.1837310791015625,
+          "eval_dead_experts": 0,
+          "eval_drop_rate": 0.20450592041015625,
+          "eval_cv": 0.28630498100409574,
+          "train_entropy_norm": 0.9793397090447449,
+          "per_layer_entropy_norm": [
+            0.966983557956142,
+            0.9785652453505996,
+            0.7596115859211671,
+            0.7564826611848436
+          ],
+          "per_layer_dead": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "seed": 0
+    },
+    {
+      "strategy": "conf",
+      "label": "5. Dense fallback where the router is not confident",
+      "description": "no aux loss, no exploration; a token whose top-k experts hold less than the threshold of the router's probability mass goes through every expert instead, threshold 0.8->0 over 80% of training",
+      "config": {
+        "model": {
+          "vocab_size": 65,
+          "block_size": 128,
+          "d_model": 128,
+          "n_head": 4,
+          "n_layer": 4,
+          "num_experts": 8,
+          "k": 2,
+          "d_hidden": 256,
+          "dropout": 0.0,
+          "aux_alpha": 0.0,
+          "capacity_factor": 1.25,
+          "gate_norm": "auto"
+        },
+        "train": {
+          "steps": 1000,
+          "batch_size": 32,
+          "block_size": 128,
+          "lr": 0.0003,
+          "lr_warmup_frac": 0.05,
+          "lr_min_frac": 0.1,
+          "weight_decay": 0.1,
+          "grad_clip": 1.0,
+          "eval_every": 250,
+          "eval_batches": 20,
+          "seed": 0,
+          "device": "cuda",
+          "equalize": "steps"
+        },
+        "strategy": {
+          "name": "conf",
+          "label": "5. Dense fallback where the router is not confident",
+          "description": "no aux loss, no exploration; a token whose top-k experts hold less than the threshold of the router's probability mass goes through every expert instead, threshold 0.8->0 over 80% of training",
+          "aux_alpha": 0.0,
+          "accum_steps": 1,
+          "dense_warmup_frac": 0.0,
+          "eps_start": 0.0,
+          "eps_end": 0.0,
+          "eps_decay_frac": 1.0,
+          "surrogate_alpha": 0.0,
+          "gate_temp": 1.0,
+          "conf_start": 0.8,
+          "tau_start": 0.0,
+          "tau_end": 0.0
+        }
+      },
+      "params": {
+        "total_params": 2402688,
+        "expert_params": 2109440,
+        "active_params_per_token": 820608,
+        "sparsity": 0.6584625219753876
+      },
+      "final": {
+        "val_loss": 2.1284167766571045,
+        "val_ppl": 8.401554738649759,
+        "drop_rate": 0.066387939453125,
+        "experts_per_token": 1.86722412109375,
+        "collapse": {
+          "load": [
+            0.113953,
+            0.103615,
+            0.154047,
+            0.116611,
+            0.140092,
+            0.095416,
+            0.166895,
+            0.109372
+          ],
+          "entropy_norm": 0.9913759833041683,
+          "max_load": 0.16689453125,
+          "dead_experts": 0,
+          "effective_experts": 7.857813625931384,
+          "cv": 0.191746198190161,
+          "gini": 0.1059158325195313
+        },
+        "per_layer_collapse": [
+          {
+            "load": [
+              0.034106,
+              0.158154,
+              0.160193,
+              0.17962,
+              0.127258,
+              0.042987,
+              0.178149,
+              0.119531
+            ],
+            "entropy_norm": 0.9461725545815107,
+            "max_load": 0.179620361328125,
+            "dead_experts": 0,
+            "effective_experts": 7.1528474028724585,
+            "cv": 0.4305230059762339,
+            "gini": 0.2309112548828125
+          },
+          {
+            "load": [
+              0.177271,
+              0.038416,
+              0.133453,
+              0.066766,
+              0.17785,
+              0.070111,
+              0.246436,
+              0.089697
+            ],
+            "entropy_norm": 0.9311576646519468,
+            "max_load": 0.246435546875,
+            "dead_experts": 0,
+            "effective_experts": 6.932967482715039,
+            "cv": 0.5328453456565497,
+            "gini": 0.2970993041992189
+          },
+          {
+            "load": [
+              0.115424,
+              0.146759,
+              0.153943,
+              0.102722,
+              0.092194,
+              0.064478,
+              0.162,
+              0.162482
+            ],
+            "entropy_norm": 0.9807089025485095,
+            "max_load": 0.162481689453125,
+            "dead_experts": 0,
+            "effective_experts": 7.685433870951282,
+            "cv": 0.2744044270300124,
+            "gini": 0.1525070190429687
+          },
+          {
+            "load": [
+              0.12901,
+              0.07113,
+              0.168597,
+              0.117334,
+              0.163068,
+              0.204089,
+              0.080994,
+              0.065778
+            ],
+            "entropy_norm": 0.9648867290027106,
+            "max_load": 0.20408935546875,
+            "dead_experts": 0,
+            "effective_experts": 7.436687694075746,
+            "cv": 0.3797435169733897,
+            "gini": 0.21417694091796857
+          }
+        ]
+      },
+      "efficiency": {
+        "wall_s": 42.18173503900016,
+        "opt_steps": 1000,
+        "micro_steps": 1000,
+        "tokens_seen": 4096000,
+        "dense_micro_steps": 0,
+        "train_expert_pairs": 62650893,
+        "train_dropped_pairs": 1652237,
+        "train_drop_rate": 0.02569450351794695,
+        "train_flops": 33006115749888,
+        "sparse_baseline_train_flops": 21255684096000,
+        "inference_flops_per_token": 1729792,
+        "dense_equivalent_flops_per_token": 4875520
+      },
+      "history": [
+        {
+          "micro_step": 250,
+          "opt_step": 250,
+          "mode": "topk",
+          "epsilon": 0.0,
+          "gate_temp": 1.0,
+          "conf_threshold": 0.551,
+          "tau_mult": 0.0,
+          "train_dense_frac": 0.96228662109375,
+          "train_experts_per_token": 7.77367041015625,
+          "train_loss": 2.423705577850342,
+          "aux_loss": 0.0,
+          "val_loss": 2.549818754196167,
+          "val_ppl": 12.804782759187407,
+          "tokens_seen": 1024000,
+          "train_flops": 14613068120064,
+          "expert_pairs": 31840954,
+          "wall_s": 10.741543985000135,
+          "eval_entropy_norm": 0.9744814520541792,
+          "eval_effective_experts": 7.5865520512672555,
+          "eval_max_load": 0.21486053466796876,
+          "eval_dead_experts": 0,
+          "eval_drop_rate": 0.1245819091796875,
+          "eval_cv": 0.33642468572695655,
+          "train_entropy_norm": 0.9999944148609939,
+          "per_layer_entropy_norm": [
+            0.9655047100751061,
+            0.9590364601068205,
+            0.9506726311670946,
+            0.8868827969729053
+          ],
+          "per_layer_dead": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "micro_step": 500,
+          "opt_step": 500,
+          "mode": "topk",
+          "epsilon": 0.0,
+          "gate_temp": 1.0,
+          "conf_threshold": 0.301,
+          "tau_mult": 0.0,
+          "train_dense_frac": 0.320786865234375,
+          "train_experts_per_token": 3.82807861328125,
+          "train_loss": 2.291358709335327,
+          "aux_loss": 0.0,
+          "val_loss": 2.3013875484466553,
+          "val_ppl": 9.98803172222931,
+          "tokens_seen": 2048000,
+          "train_flops": 22871315841024,
+          "expert_pairs": 47520764,
+          "wall_s": 22.4410189299997,
+          "eval_entropy_norm": 0.9884298369250997,
+          "eval_effective_experts": 7.809821153721662,
+          "eval_max_load": 0.17270050048828126,
+          "eval_dead_experts": 0,
+          "eval_drop_rate": 0.06121368408203125,
+          "eval_cv": 0.22150195041940354,
+          "train_entropy_norm": 0.9972724823577453,
+          "per_layer_entropy_norm": [
+            0.9563096940454848,
+            0.9502611121785565,
+            0.9752888443322674,
+            0.9693115584661901
+          ],
+          "per_layer_dead": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "micro_step": 750,
+          "opt_step": 750,
+          "mode": "topk",
+          "epsilon": 0.0,
+          "gate_temp": 1.0,
+          "conf_threshold": 0.051,
+          "tau_mult": 0.0,
+          "train_dense_frac": 9.423828125e-05,
+          "train_experts_per_token": 1.8519521484375,
+          "train_loss": 2.1548380851745605,
+          "aux_loss": 0.0,
+          "val_loss": 2.1787641048431396,
+          "val_ppl": 8.835379904964247,
+          "tokens_seen": 3072000,
+          "train_flops": 27946789109760,
+          "expert_pairs": 55106360,
+          "wall_s": 32.73927704899961,
+          "eval_entropy_norm": 0.9919394424315885,
+          "eval_effective_experts": 7.867025867335425,
+          "eval_max_load": 0.16030426025390626,
+          "eval_dead_experts": 0,
+          "eval_drop_rate": 0.06219940185546875,
+          "eval_cv": 0.1846341882408358,
+          "train_entropy_norm": 0.9889973546687758,
+          "per_layer_entropy_norm": [
+            0.9447768569525518,
+            0.937735876985322,
+            0.9798431195740726,
+            0.9640643888817955
+          ],
+          "per_layer_dead": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "micro_step": 1000,
+          "opt_step": 1000,
+          "mode": "topk",
+          "epsilon": 0.0,
+          "gate_temp": 1.0,
+          "conf_threshold": 0.0,
+          "tau_mult": 0.0,
+          "train_dense_frac": 0.0,
+          "train_experts_per_token": 1.841927001953125,
+          "train_loss": 2.063297748565674,
+          "aux_loss": 0.0,
+          "val_loss": 2.1284167766571045,
+          "val_ppl": 8.401554738649759,
+          "tokens_seen": 4096000,
+          "train_flops": 33006115749888,
+          "expert_pairs": 62650893,
+          "wall_s": 41.92362723399947,
+          "eval_entropy_norm": 0.9913759833041683,
+          "eval_effective_experts": 7.857813625931384,
+          "eval_max_load": 0.16689453125,
+          "eval_dead_experts": 0,
+          "eval_drop_rate": 0.066387939453125,
+          "eval_cv": 0.191746198190161,
+          "train_entropy_norm": 0.9900030304536008,
+          "per_layer_entropy_norm": [
+            0.9461725545815107,
+            0.9311576646519468,
+            0.9807089025485095,
+            0.9648867290027106
+          ],
+          "per_layer_dead": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "seed": 0
+    },
+    {
+      "strategy": "threshold",
+      "label": "6. Threshold selection instead of top-k",
+      "description": "no aux loss, no exploration; every expert above 1->1.6 uniform shares (1/E) is selected, so the count varies per token, rising over 80% of training. Unlike the others this is the routing rule at evaluation too",
+      "config": {
+        "model": {
+          "vocab_size": 65,
+          "block_size": 128,
+          "d_model": 128,
+          "n_head": 4,
+          "n_layer": 4,
+          "num_experts": 8,
+          "k": 2,
+          "d_hidden": 256,
+          "dropout": 0.0,
+          "aux_alpha": 0.0,
+          "capacity_factor": 1.25,
+          "gate_norm": "auto"
+        },
+        "train": {
+          "steps": 1000,
+          "batch_size": 32,
+          "block_size": 128,
+          "lr": 0.0003,
+          "lr_warmup_frac": 0.05,
+          "lr_min_frac": 0.1,
+          "weight_decay": 0.1,
+          "grad_clip": 1.0,
+          "eval_every": 250,
+          "eval_batches": 20,
+          "seed": 0,
+          "device": "cuda",
+          "equalize": "steps"
+        },
+        "strategy": {
+          "name": "threshold",
+          "label": "6. Threshold selection instead of top-k",
+          "description": "no aux loss, no exploration; every expert above 1->1.6 uniform shares (1/E) is selected, so the count varies per token, rising over 80% of training. Unlike the others this is the routing rule at evaluation too",
+          "aux_alpha": 0.0,
+          "accum_steps": 1,
+          "dense_warmup_frac": 0.0,
+          "eps_start": 0.0,
+          "eps_end": 0.0,
+          "eps_decay_frac": 1.0,
+          "surrogate_alpha": 0.0,
+          "gate_temp": 1.0,
+          "conf_start": 0.0,
+          "tau_start": 1.0,
+          "tau_end": 1.6
+        }
+      },
+      "params": {
+        "total_params": 2402688,
+        "expert_params": 2109440,
+        "active_params_per_token": 820608,
+        "sparsity": 0.6584625219753876
+      },
+      "final": {
+        "val_loss": 2.1726834774017334,
+        "val_ppl": 8.781818260693239,
+        "drop_rate": 0.11518200093333812,
+        "experts_per_token": 1.203533935546875,
+        "collapse": {
+          "load": [
+            0.117771,
+            0.104601,
+            0.135565,
+            0.10899,
+            0.177031,
+            0.112425,
+            0.141991,
+            0.101626
+          ],
+          "entropy_norm": 0.9917490565039904,
+          "max_load": 0.17703135657105934,
+          "dead_experts": 0,
+          "effective_experts": 7.863911956496081,
+          "cv": 0.19050978071492525,
+          "gini": 0.0999821633700686
+        },
+        "per_layer_collapse": [
+          {
+            "load": [
+              0.091584,
+              0.151263,
+              0.03208,
+              0.201817,
+              0.091769,
+              0.097573,
+              0.156678,
+              0.177237
+            ],
+            "entropy_norm": 0.9527980784785764,
+            "max_load": 0.20181726105841336,
+            "dead_experts": 0,
+            "effective_experts": 7.252076961014442,
+            "cv": 0.4188573066950642,
+            "gini": 0.23310560760405918
+          },
+          {
+            "load": [
+              0.046973,
+              0.055369,
+              0.15967,
+              0.153037,
+              0.383687,
+              0.050851,
+              0.124078,
+              0.026336
+            ],
+            "entropy_norm": 0.845326230110545,
+            "max_load": 0.38368698960348957,
+            "dead_experts": 0,
+            "effective_experts": 5.799701665017391,
+            "cv": 0.8721346228892422,
+            "gini": 0.43002648322455816
+          },
+          {
+            "load": [
+              0.162689,
+              0.148989,
+              0.174854,
+              0.015824,
+              0.115389,
+              0.073264,
+              0.14297,
+              0.166021
+            ],
+            "entropy_norm": 0.9456778510403844,
+            "max_load": 0.17485406131694342,
+            "dead_experts": 0,
+            "effective_experts": 7.145493001416183,
+            "cv": 0.41158510109400775,
+            "gini": 0.21561362336471523
+          },
+          {
+            "load": [
+              0.175257,
+              0.071459,
+              0.165845,
+              0.06714,
+              0.089941,
+              0.232769,
+              0.147119,
+              0.05047
+            ],
+            "entropy_norm": 0.9433791109591175,
+            "max_load": 0.23276864682600504,
+            "dead_experts": 0,
+            "effective_experts": 7.11141836651632,
+            "cv": 0.4841126248778152,
+            "gini": 0.2696261619048479
+          }
+        ]
+      },
+      "efficiency": {
+        "wall_s": 40.32208386399998,
+        "opt_steps": 1000,
+        "micro_steps": 1000,
+        "tokens_seen": 4096000,
+        "dense_micro_steps": 0,
+        "train_expert_pairs": 24704701,
+        "train_dropped_pairs": 3793494,
+        "train_drop_rate": 0.13311348315217858,
+        "train_flops": 18085065916416,
+        "sparse_baseline_train_flops": 21255684096000,
+        "inference_flops_per_token": 1729792,
+        "dense_equivalent_flops_per_token": 4875520
+      },
+      "history": [
+        {
+          "micro_step": 250,
+          "opt_step": 250,
+          "mode": "topk",
+          "epsilon": 0.0,
+          "gate_temp": 1.0,
+          "conf_threshold": 0.0,
+          "tau_mult": 1.1867,
+          "train_dense_frac": 0.0,
+          "train_experts_per_token": 2.03624755859375,
+          "train_loss": 2.4196715354919434,
+          "aux_loss": 0.0,
+          "val_loss": 2.438098192214966,
+          "val_ppl": 11.451241959710144,
+          "tokens_seen": 1024000,
+          "train_flops": 5372301803520,
+          "expert_pairs": 8340470,
+          "wall_s": 10.11518829600027,
+          "eval_entropy_norm": 0.9795493987728482,
+          "eval_effective_experts": 7.666925686881678,
+          "eval_max_load": 0.17362724458204334,
+          "eval_dead_experts": 0,
+          "eval_drop_rate": 0.10593023735810113,
+          "eval_cv": 0.28831714606301345,
+          "train_entropy_norm": 0.9772087645148417,
+          "per_layer_entropy_norm": [
+            0.9717819171595895,
+            0.9461501329666013,
+            0.9182191830888267,
+            0.8804168808821102
+          ],
+          "per_layer_dead": [
+            0,
+            0,
+            1,
+            1
+          ]
+        },
+        {
+          "micro_step": 500,
+          "opt_step": 500,
+          "mode": "topk",
+          "epsilon": 0.0,
+          "gate_temp": 1.0,
+          "conf_threshold": 0.0,
+          "tau_mult": 1.3742,
+          "train_dense_frac": 0.0,
+          "train_experts_per_token": 1.488970458984375,
+          "train_loss": 2.2888216972351074,
+          "aux_loss": 0.0,
+          "val_loss": 2.306285858154297,
+          "val_ppl": 10.037076214468634,
+          "tokens_seen": 2048000,
+          "train_flops": 9863152140288,
+          "expert_pairs": 14439293,
+          "wall_s": 20.307622623000498,
+          "eval_entropy_norm": 0.9943902173322838,
+          "eval_effective_experts": 7.90722047768694,
+          "eval_max_load": 0.15192822569841513,
+          "eval_dead_experts": 0,
+          "eval_drop_rate": 0.09298352227608876,
+          "eval_cv": 0.15433360113408448,
+          "train_entropy_norm": 0.9903366324303179,
+          "per_layer_entropy_norm": [
+            0.9630953912999259,
+            0.9140002650999404,
+            0.93952456273686,
+            0.9533231498770588
+          ],
+          "per_layer_dead": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "micro_step": 750,
+          "opt_step": 750,
+          "mode": "topk",
+          "epsilon": 0.0,
+          "gate_temp": 1.0,
+          "conf_threshold": 0.0,
+          "tau_mult": 1.5617,
+          "train_dense_frac": 0.0,
+          "train_experts_per_token": 1.314946533203125,
+          "train_loss": 2.2065069675445557,
+          "aux_loss": 0.0,
+          "val_loss": 2.210744619369507,
+          "val_ppl": 9.122506659801829,
+          "tokens_seen": 3072000,
+          "train_flops": 14073717325824,
+          "expert_pairs": 19825314,
+          "wall_s": 30.234038393000446,
+          "eval_entropy_norm": 0.9937062234673125,
+          "eval_effective_experts": 7.895981832687239,
+          "eval_max_load": 0.165960346746838,
+          "eval_dead_experts": 0,
+          "eval_drop_rate": 0.1032308110334914,
+          "eval_cv": 0.16486065348454035,
+          "train_entropy_norm": 0.9935273485194588,
+          "per_layer_entropy_norm": [
+            0.9514916613085563,
+            0.8785942125807615,
+            0.9458225861582358,
+            0.9454869906030702
+          ],
+          "per_layer_dead": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "micro_step": 1000,
+          "opt_step": 1000,
+          "mode": "topk",
+          "epsilon": 0.0,
+          "gate_temp": 1.0,
+          "conf_threshold": 0.0,
+          "tau_mult": 1.6,
+          "train_dense_frac": 0.0,
+          "train_experts_per_token": 1.191256591796875,
+          "train_loss": 2.1090586185455322,
+          "aux_loss": 0.0,
+          "val_loss": 2.1726834774017334,
+          "val_ppl": 8.781818260693239,
+          "tokens_seen": 4096000,
+          "train_flops": 18085065916416,
+          "expert_pairs": 24704701,
+          "wall_s": 40.1064441970002,
+          "eval_entropy_norm": 0.9917490565039904,
+          "eval_effective_experts": 7.863911956496081,
+          "eval_max_load": 0.17703135657105934,
+          "eval_dead_experts": 0,
+          "eval_drop_rate": 0.11518200093333812,
+          "eval_cv": 0.19050978071492525,
+          "train_entropy_norm": 0.9903115781448896,
+          "per_layer_entropy_norm": [
+            0.9527980784785764,
+            0.845326230110545,
+            0.9456778510403844,
+            0.9433791109591175
+          ],
+          "per_layer_dead": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "seed": 0
+    }
+  ],
+  "corpus": {
+    "vocab_size": 65,
+    "train_tokens": 1003855,
+    "val_tokens": 111539
+  },
+  "device": "cuda",
+  "seeds": [
+    0
+  ]
+}

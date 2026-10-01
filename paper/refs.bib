@@ -1,0 +1,484 @@
+% ---------------- Core MoE ----------------
+@inproceedings{shazeer2017outrageously,
+  title={Outrageously Large Neural Networks: The Sparsely-Gated Mixture-of-Experts Layer},
+  author={Shazeer, Noam and Mirhoseini, Azalia and Maziarz, Krzysztof and Davis, Andy and Le, Quoc and Hinton, Geoffrey and Dean, Jeff},
+  booktitle={International Conference on Learning Representations (ICLR)},
+  year={2017},
+  eprint={1701.06538}, archivePrefix={arXiv}, primaryClass={cs.LG}
+}
+@article{jacobs1991adaptive,
+  title={Adaptive Mixtures of Local Experts},
+  author={Jacobs, Robert A. and Jordan, Michael I. and Nowlan, Steven J. and Hinton, Geoffrey E.},
+  journal={Neural Computation},
+  volume={3}, number={1}, pages={79--87},
+  year={1991}
+}
+@inproceedings{lepikhin2021gshard,
+  title={{GShard}: Scaling Giant Models with Conditional Computation and Automatic Sharding},
+  author={Lepikhin, Dmitry and Lee, HyoukJoong and Xu, Yuanzhong and Chen, Dehao and Firat, Orhan and Huang, Yanping and Krikun, Maxim and Shazeer, Noam and Chen, Zhifeng},
+  booktitle={International Conference on Learning Representations (ICLR)},
+  year={2021},
+  eprint={2006.16668}, archivePrefix={arXiv}, primaryClass={cs.CL}
+}
+@article{fedus2022switch,
+  title={Switch Transformers: Scaling to Trillion Parameter Models with Simple and Efficient Sparsity},
+  author={Fedus, William and Zoph, Barret and Shazeer, Noam},
+  journal={Journal of Machine Learning Research},
+  volume={23}, number={120}, pages={1--39},
+  year={2022},
+  eprint={2101.03961}, archivePrefix={arXiv}, primaryClass={cs.LG}
+}
+@article{zoph2022stmoe,
+  title={{ST-MoE}: Designing Stable and Transferable Sparse Expert Models},
+  author={Zoph, Barret and Bello, Irwan and Kumar, Sameer and Du, Nan and Huang, Yanping and Dean, Jeff and Shazeer, Noam and Fedus, William},
+  journal={arXiv preprint arXiv:2202.08906},
+  year={2022},
+  eprint={2202.08906}, archivePrefix={arXiv}, primaryClass={cs.CL}
+}
+@inproceedings{lewis2021base,
+  title={{BASE} Layers: Simplifying Training of Large, Sparse Models},
+  author={Lewis, Mike and Bhosale, Shruti and Dettmers, Tim and Goyal, Naman and Zettlemoyer, Luke},
+  booktitle={International Conference on Machine Learning (ICML)},
+  year={2021},
+  eprint={2103.16716}, archivePrefix={arXiv}, primaryClass={cs.CL}
+}
+@inproceedings{roller2021hash,
+  title={Hash Layers For Large Sparse Models},
+  author={Roller, Stephen and Sukhbaatar, Sainbayar and Szlam, Arthur and Weston, Jason},
+  booktitle={Advances in Neural Information Processing Systems (NeurIPS)},
+  year={2021},
+  eprint={2106.04426}, archivePrefix={arXiv}, primaryClass={cs.LG}
+}
+@inproceedings{zhou2022expertchoice,
+  title={Mixture-of-Experts with Expert Choice Routing},
+  author={Zhou, Yanqi and Lei, Tao and Liu, Hanxiao and Du, Nan and Huang, Yanping and Zhao, Vincent and Dai, Andrew and Chen, Zhifeng and Le, Quoc and Laudon, James},
+  booktitle={Advances in Neural Information Processing Systems (NeurIPS)},
+  year={2022},
+  eprint={2202.09368}, archivePrefix={arXiv}, primaryClass={cs.LG}
+}
+@article{jiang2024mixtral,
+  title={Mixtral of Experts},
+  author={Jiang, Albert Q. and Sablayrolles, Alexandre and Roux, Antoine and Mensch, Arthur and Savary, Blanche and Bamford, Chris and others},
+  journal={arXiv preprint arXiv:2401.04088},
+  year={2024},
+  eprint={2401.04088}, archivePrefix={arXiv}, primaryClass={cs.LG}
+}
+@inproceedings{dai2024deepseekmoe,
+  title={{DeepSeekMoE}: Towards Ultimate Expert Specialization in Mixture-of-Experts Language Models},
+  author={Dai, Damai and Deng, Chengqi and Zhao, Chenggang and Xu, R. X. and Gao, Huazuo and Chen, Deli and Li, Jiashi and Zeng, Wangding and Yu, Xingkai and Wu, Y. and others},
+  booktitle={Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)},
+  pages={1280--1297},
+  year={2024},
+  eprint={2401.06066}, archivePrefix={arXiv}, primaryClass={cs.CL}
+}
+@article{deepseekai2024v3,
+  title={{DeepSeek-V3} Technical Report},
+  author={{DeepSeek-AI} and Liu, Aixin and Feng, Bei and Xue, Bing and Wang, Bingxuan and Wu, Bochao and others},
+  journal={arXiv preprint arXiv:2412.19437},
+  year={2024},
+  eprint={2412.19437}, archivePrefix={arXiv}, primaryClass={cs.CL}
+}
+@article{wang2024auxfree,
+  title={Auxiliary-Loss-Free Load Balancing Strategy for Mixture-of-Experts},
+  author={Wang, Lean and Gao, Huazuo and Zhao, Chenggang and Sun, Xu and Dai, Damai},
+  journal={arXiv preprint arXiv:2408.15664},
+  year={2024},
+  eprint={2408.15664}, archivePrefix={arXiv}, primaryClass={cs.LG}
+}
+@inproceedings{chi2022representation,
+  title={On the Representation Collapse of Sparse Mixture of Experts},
+  author={Chi, Zewen and Dong, Li and Huang, Shaohan and Dai, Damai and Ma, Shuming and Patra, Barun and others},
+  booktitle={Advances in Neural Information Processing Systems (NeurIPS)},
+  year={2022},
+  eprint={2204.09179}, archivePrefix={arXiv}, primaryClass={cs.CL}
+}
+@inproceedings{puigcerver2024soft,
+  title={From Sparse to Soft Mixtures of Experts},
+  author={Puigcerver, Joan and Riquelme, Carlos and Mustafa, Basil and Houlsby, Neil},
+  booktitle={International Conference on Learning Representations (ICLR)},
+  year={2024},
+  eprint={2308.00951}, archivePrefix={arXiv}, primaryClass={cs.LG}
+}
+@inproceedings{clark2022unified,
+  title={Unified Scaling Laws for Routed Language Models},
+  author={Clark, Aidan and de las Casas, Diego and Guy, Aurelia and Mensch, Arthur and Paganini, Michela and Hoffmann, Jordan and others},
+  booktitle={International Conference on Machine Learning (ICML)},
+  year={2022},
+  eprint={2202.01169}, archivePrefix={arXiv}, primaryClass={cs.CL}
+}
+@inproceedings{krajewski2024scaling,
+  title={Scaling Laws for Fine-Grained Mixture of Experts},
+  author={Ludziejewski, Jan and Krajewski, Jakub and Adamczewski, Kamil and Pi{\'o}ro, Maciej and Krutul, Micha{\l} and Antoniak, Szymon and Ciebiera, Kamil and Kr{\'o}l, Krystian and Odrzyg{\'o}{\'z}d{\'z}, Tomasz and Sankowski, Piotr and Cygan, Marek and Jaszczur, Sebastian},
+  booktitle={Proceedings of the 41st International Conference on Machine Learning (ICML)},
+  series={Proceedings of Machine Learning Research},
+  volume={235}, pages={33270--33288},
+  year={2024},
+  eprint={2402.07871}, archivePrefix={arXiv}, primaryClass={cs.LG}
+}
+@article{he2024million,
+  title={Mixture of A Million Experts},
+  author={He, Xu Owen},
+  journal={arXiv preprint arXiv:2407.04153},
+  year={2024},
+  eprint={2407.04153}, archivePrefix={arXiv}, primaryClass={cs.LG}
+}
+@inproceedings{qiu2025demons,
+  title={Demons in the Detail: On Implementing Load Balancing Loss for Training Specialized Mixture-of-Expert Models},
+  author={Qiu, Zihan and Huang, Zeyu and Zheng, Bo and Wen, Kaiyue and Wang, Zekun and Men, Rui and Titov, Ivan and Liu, Dayiheng and Zhou, Jingren and Lin, Junyang},
+  booktitle={Proceedings of the 63rd Annual Meeting of the Association for Computational Linguistics (ACL)},
+  year={2025},
+  eprint={2501.11873}, archivePrefix={arXiv}, primaryClass={cs.LG}
+}
+@inproceedings{muennighoff2025olmoe,
+  title={{OLMoE}: Open Mixture-of-Experts Language Models},
+  author={Muennighoff, Niklas and Soldaini, Luca and Groeneveld, Dirk and Lo, Kyle and Morrison, Jacob and Min, Sewon and others},
+  booktitle={International Conference on Learning Representations (ICLR)},
+  year={2025},
+  eprint={2409.02060}, archivePrefix={arXiv}, primaryClass={cs.CL}
+}
+@inproceedings{dai2022stablemoe,
+  title={{StableMoE}: Stable Routing Strategy for Mixture of Experts},
+  author={Dai, Damai and Dong, Li and Ma, Shuming and Zheng, Bo and Sui, Zhifang and Chang, Baobao and Wei, Furu},
+  booktitle={Proceedings of the 60th Annual Meeting of the Association for Computational Linguistics (ACL)},
+  year={2022},
+  eprint={2204.08396}, archivePrefix={arXiv}, primaryClass={cs.LG}
+}
+@article{nie2021evomoe,
+  title={{EvoMoE}: An Evolutional Mixture-of-Experts Training Framework via Dense-To-Sparse Gate},
+  author={Nie, Xiaonan and Miao, Xupeng and Cao, Shijie and Ma, Lingxiao and Liu, Qibin and Xue, Jilong and others},
+  journal={arXiv preprint arXiv:2112.14397},
+  year={2021},
+  eprint={2112.14397}, archivePrefix={arXiv}, primaryClass={cs.LG}
+}
+@inproceedings{hazimeh2021dselectk,
+  title={{DSelect-k}: Differentiable Selection in the Mixture of Experts with Applications to Multi-Task Learning},
+  author={Hazimeh, Hussein and Zhao, Zhe and Chowdhery, Aakanksha and Sathiamoorthy, Maheswaran and Chen, Yihua and Mazumder, Rahul and Hong, Lichan and Chi, Ed H.},
+  booktitle={Advances in Neural Information Processing Systems (NeurIPS)},
+  year={2021},
+  eprint={2106.03760}, archivePrefix={arXiv}, primaryClass={cs.LG}
+}
+@article{liu2023sparsemixer,
+  title={Sparse Backpropagation for {MoE} Training},
+  author={Liu, Liyuan and Gao, Jianfeng and Chen, Weizhu},
+  journal={arXiv preprint arXiv:2310.00811},
+  year={2023},
+  eprint={2310.00811}, archivePrefix={arXiv}, primaryClass={cs.LG}
+}
+@article{liu2024grin,
+  title={{GRIN}: {GRadient-INformed} {MoE}},
+  author={Liu, Liyuan and Kim, Young Jin and Wang, Shuohang and Liang, Chen and Shen, Yelong and Cheng, Hao and others},
+  journal={arXiv preprint arXiv:2409.12136},
+  year={2024},
+  eprint={2409.12136}, archivePrefix={arXiv}, primaryClass={cs.CL}
+}
+@inproceedings{panda2025dense,
+  title={Dense Backpropagation Improves Training for Sparse Mixture-of-Experts},
+  author={Panda, Ashwinee and Baherwani, Vatsal and Sarwar, Zain and Therien, Benjamin and Sahu, Sambit and Goldstein, Tom and Chakraborty, Supriyo},
+  booktitle={Advances in Neural Information Processing Systems (NeurIPS)},
+  year={2025},
+  eprint={2504.12463}, archivePrefix={arXiv}, primaryClass={cs.LG}
+}
+@inproceedings{wang2025remoe,
+  title={{ReMoE}: Fully Differentiable Mixture-of-Experts with {ReLU} Routing},
+  author={Wang, Ziteng and Zhu, Jun and Chen, Jianfei},
+  booktitle={International Conference on Learning Representations (ICLR)},
+  year={2025},
+  eprint={2412.14711}, archivePrefix={arXiv}, primaryClass={cs.LG}
+}
+@inproceedings{huang2024harder,
+  title={Harder Tasks Need More Experts: Dynamic Routing in {MoE} Models},
+  author={Huang, Quzhe and An, Zhenwei and Zhuang, Nan and Tao, Mingxu and Zhang, Chen and Jin, Yang and Xu, Kun and Chen, Liwei and Huang, Songfang and Feng, Yansong},
+  booktitle={Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (ACL)},
+  year={2024},
+  eprint={2403.07652}, archivePrefix={arXiv}, primaryClass={cs.CL}
+}
+@inproceedings{guo2025dynmoe,
+  title={Dynamic Mixture of Experts: An Auto-Tuning Approach for Efficient Transformer Models},
+  author={Guo, Yongxin and Cheng, Zhenglin and Tang, Xiaoying and Tu, Zhaopeng and Lin, Tao},
+  booktitle={International Conference on Learning Representations (ICLR)},
+  year={2025},
+  eprint={2405.14297}, archivePrefix={arXiv}, primaryClass={cs.LG}
+}
+@inproceedings{yang2024xmoe,
+  title={{XMoE}: Sparse Models with Fine-grained and Adaptive Expert Selection},
+  author={Yang, Yuanhang and Qi, Shiyi and Gu, Wenchao and Wang, Chaozheng and Gao, Cuiyun and Xu, Zenglin},
+  booktitle={Findings of the Association for Computational Linguistics: ACL 2024},
+  year={2024},
+  eprint={2403.18926}, archivePrefix={arXiv}, primaryClass={cs.CL}
+}
+@inproceedings{zeng2024adamoe,
+  title={{AdaMoE}: Token-Adaptive Routing with Null Experts for Mixture-of-Experts Language Models},
+  author={Zeng, Zihao and Miao, Yibo and Gao, Hongcheng and Zhang, Hao and Deng, Zhijie},
+  booktitle={Findings of the Association for Computational Linguistics: EMNLP 2024},
+  year={2024},
+  eprint={2406.13233}, archivePrefix={arXiv}, primaryClass={cs.CL}
+}
+@inproceedings{guo2025advancing,
+  title={Advancing Expert Specialization for Better {MoE}},
+  author={Guo, Hongcan and Lu, Haolang and Nan, Guoshun and Chu, Bolun and Zhuang, Jialin and Yang, Yuan and others},
+  booktitle={Advances in Neural Information Processing Systems (NeurIPS)},
+  year={2025},
+  eprint={2505.22323}, archivePrefix={arXiv}, primaryClass={cs.LG}
+}
+@article{eliseev2023offloading,
+  title={Fast Inference of Mixture-of-Experts Language Models with Offloading},
+  author={Eliseev, Artyom and Mazur, Denis},
+  journal={arXiv preprint arXiv:2312.17238},
+  year={2023},
+  eprint={2312.17238}, archivePrefix={arXiv}, primaryClass={cs.LG}
+}
+@inproceedings{frantar2024qmoe,
+  title={{QMoE}: Sub-1-Bit Compression of Trillion-Parameter Models},
+  author={Frantar, Elias and Alistarh, Dan},
+  booktitle={Proceedings of Machine Learning and Systems (MLSys)},
+  volume={6},
+  year={2024},
+  eprint={2310.16795}, archivePrefix={arXiv}, primaryClass={cs.LG}
+}
+@inproceedings{lu2024notall,
+  title={Not All Experts are Equal: Efficient Expert Pruning and Skipping for Mixture-of-Experts Large Language Models},
+  author={Lu, Xudong and Liu, Qi and Xu, Yuhui and Zhou, Aojun and Huang, Siyuan and Zhang, Bo and Yan, Junchi and Li, Hongsheng},
+  booktitle={Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (ACL)},
+  year={2024},
+  eprint={2402.14800}, archivePrefix={arXiv}, primaryClass={cs.CL}
+}
+@inproceedings{li2024mcsmoe,
+  title={Merge, Then Compress: Demystify Efficient {SMoE} with Hints from Its Routing Policy},
+  author={Li, Pingzhi and Zhang, Zhenyu and Yadav, Prateek and Sung, Yi-Lin and Cheng, Yu and Bansal, Mohit and Chen, Tianlong},
+  booktitle={International Conference on Learning Representations (ICLR)},
+  year={2024},
+  eprint={2310.01334}, archivePrefix={arXiv}, primaryClass={cs.LG}
+}
+
+@inproceedings{chen2022towards,
+  title={Towards Understanding the Mixture-of-Experts Layer in Deep Learning},
+  author={Chen, Zixiang and Deng, Yihe and Wu, Yue and Gu, Quanquan and Li, Yuanzhi},
+  booktitle={Advances in Neural Information Processing Systems (NeurIPS)},
+  volume={35},
+  year={2022},
+  eprint={2208.02813}, archivePrefix={arXiv}, primaryClass={cs.LG}
+}
+@inproceedings{rajbhandari2022deepspeedmoe,
+  title={{DeepSpeed-MoE}: Advancing Mixture-of-Experts Inference and Training to Power Next-Generation {AI} Scale},
+  author={Rajbhandari, Samyam and Li, Conglong and Yao, Zhewei and Zhang, Minjia and Aminabadi, Reza Yazdani and Awan, Ammar Ahmad and Rasley, Jeff and He, Yuxiong},
+  booktitle={International Conference on Machine Learning (ICML)},
+  pages={18332--18346},
+  year={2022},
+  eprint={2201.05596}, archivePrefix={arXiv}, primaryClass={cs.LG}
+}
+@article{bengio2013estimating,
+  title={Estimating or Propagating Gradients Through Stochastic Neurons for Conditional Computation},
+  author={Bengio, Yoshua and L{\'e}onard, Nicholas and Courville, Aaron},
+  journal={arXiv preprint arXiv:1308.3432},
+  year={2013},
+  eprint={1308.3432}, archivePrefix={arXiv}, primaryClass={cs.LG}
+}
+@article{yang2025qwen3,
+  title={{Qwen3} Technical Report},
+  author={Yang, An and Li, Anfeng and Yang, Baosong and Zhang, Beichen and Hui, Binyuan and Zheng, Bo and others},
+  journal={arXiv preprint arXiv:2505.09388},
+  year={2025},
+  eprint={2505.09388}, archivePrefix={arXiv}, primaryClass={cs.CL}
+}
+@article{kimiteam2025k2,
+  title={Kimi {K2}: Open Agentic Intelligence},
+  author={{Kimi Team} and Bai, Yifan and Bao, Yiping and Charles, Y. and Chen, Cheng and Chen, Guanduo and others},
+  journal={arXiv preprint arXiv:2507.20534},
+  year={2025},
+  eprint={2507.20534}, archivePrefix={arXiv}, primaryClass={cs.LG}
+}
+@misc{meta2025llama4,
+  title={The {Llama} 4 Herd: The Beginning of a New Era of Natively Multimodal {AI} Innovation},
+  author={{Meta AI}},
+  year={2025},
+  howpublished={\url{https://ai.meta.com/blog/llama-4-multimodal-intelligence/}}
+}
+@misc{karpathy2015charrnn,
+  title={char-rnn: Multi-layer Recurrent Neural Networks for Character-Level Language Models},
+  author={Karpathy, Andrej},
+  year={2015},
+  howpublished={\url{https://github.com/karpathy/char-rnn}},
+  note={Source of the tiny-shakespeare corpus}
+}
+
+% ---------------- Specialisation versus balancing ----------------
+@inproceedings{chen2023modsquad,
+  title={{Mod-Squad}: Designing Mixtures of Experts As Modular Multi-Task Learners},
+  author={Chen, Zitian and Shen, Yikang and Ding, Mingyu and Chen, Zhenfang and Zhao, Hengshuang and Learned-Miller, Erik and Gan, Chuang},
+  booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+  year={2023},
+  eprint={2212.08066}, archivePrefix={arXiv}, primaryClass={cs.CV}
+}
+@article{shen2023moduleformer,
+  title={{ModuleFormer}: Modularity Emerges from Mixture-of-Experts},
+  author={Shen, Yikang and Zhang, Zheyu and Cao, Tianyou and Tan, Shawn and Chen, Zhenfang and Gan, Chuang},
+  journal={arXiv preprint arXiv:2306.04640},
+  year={2023},
+  eprint={2306.04640}, archivePrefix={arXiv}, primaryClass={cs.CL}
+}
+@article{wang2026myth,
+  title={The Myth of Expert Specialization in {MoEs}: Why Routing Reflects Geometry, Not Necessarily Domain Expertise},
+  author={Wang, Xi and Hayou, Soufiane and Nalisnick, Eric},
+  journal={arXiv preprint arXiv:2604.09780},
+  year={2026},
+  eprint={2604.09780}, archivePrefix={arXiv}, primaryClass={cs.LG}
+}
+@article{ahrac2026routers,
+  title={Routers Learn the Geometry of Their Experts: Geometric Coupling in Sparse Mixture-of-Experts},
+  author={Ahrac, Sagi and Hochwald, Noya and Geva, Mor},
+  journal={arXiv preprint arXiv:2605.12476},
+  year={2026},
+  eprint={2605.12476}, archivePrefix={arXiv}, primaryClass={cs.LG}
+}
+@article{falke2026testbed,
+  title={{MoE} Routing Testbed: Studying Expert Specialization and Routing Behavior at Small Scale},
+  author={Falke, Tobias and Anastassacos, Nicolas and Tan, Samson and Meas, Chankrisna Richy and Prakash, Chandana Satya and Sekhar, Nitesh and others},
+  journal={arXiv preprint arXiv:2604.07030},
+  year={2026},
+  eprint={2604.07030}, archivePrefix={arXiv}, primaryClass={cs.LG}
+}
+@article{omi2025similarity,
+  title={Load Balancing Mixture of Experts with Similarity Preserving Routers},
+  author={Omi, Nabil and Sen, Siddhartha and Farhadi, Ali},
+  journal={arXiv preprint arXiv:2506.14038},
+  year={2025},
+  eprint={2506.14038}, archivePrefix={arXiv}, primaryClass={cs.LG}
+}
+@inproceedings{lv2026erc,
+  title={Coupling Experts and Routers in Mixture-of-Experts via an Auxiliary Loss},
+  author={Lv, Ang and Ma, Jin and Ma, Yiyuan and Qiao, Siyuan},
+  booktitle={International Conference on Learning Representations (ICLR)},
+  year={2026},
+  eprint={2512.23447}, archivePrefix={arXiv}, primaryClass={cs.LG}
+}
+@inproceedings{li2026divergence,
+  title={Expert Divergence Learning for {MoE}-based Language Models},
+  author={Li, Jiaang and Chen, Haibin and Liu, Langming and Yuan, Yujin and Wang, Yadao and Zhang, Yizhen and others},
+  booktitle={International Conference on Learning Representations (ICLR)},
+  year={2026},
+  eprint={2603.00054}, archivePrefix={arXiv}, primaryClass={cs.CL}
+}
+@article{hu2026synergistic,
+  title={Synergistic Intra- and Cross-Layer Regularization Losses for {MoE} Expert Specialization},
+  author={Hu, Rizhen and Cao, Yuan and Kong, Boao and Sun, Mou and Yuan, Kun},
+  journal={arXiv preprint arXiv:2602.14159},
+  year={2026},
+  eprint={2602.14159}, archivePrefix={arXiv}, primaryClass={cs.LG}
+}
+@article{chen2026phibalancing,
+  title={$\phi$-Balancing for Mixture-of-Experts Training},
+  author={Chen, Lizhang and Li, Jonathan and Wang, Qi and Liao, Runlong and Li, Shuozhe and Liang, Chen and others},
+  journal={arXiv preprint arXiv:2605.15403},
+  year={2026},
+  eprint={2605.15403}, archivePrefix={arXiv}, primaryClass={cs.LG}
+}
+@inproceedings{zuo2022thor,
+  title={Taming Sparsely Activated Transformer with Stochastic Experts},
+  author={Zuo, Simiao and Liu, Xiaodong and Jiao, Jian and Kim, Young Jin and Hassan, Hany and Zhang, Ruofei and others},
+  booktitle={International Conference on Learning Representations (ICLR)},
+  year={2022},
+  eprint={2110.04260}, archivePrefix={arXiv}, primaryClass={cs.CL}
+}
+@article{fan2024empirical,
+  title={Towards an Empirical Understanding of {MoE} Design Choices},
+  author={Fan, Dongyang and Messmer, Bettina and Jaggi, Martin},
+  journal={arXiv preprint arXiv:2402.13089},
+  year={2024},
+  eprint={2402.13089}, archivePrefix={arXiv}, primaryClass={cs.LG}
+}
+@inproceedings{zhao2026probmoe,
+  title={{ProbMoE}: Differentiable Probabilistic Routing for Mixture-of-Experts},
+  author={Zhao, Heng and Shao, Zilei and Van den Broeck, Guy and Zeng, Zhe},
+  booktitle={International Conference on Machine Learning (ICML)},
+  year={2026},
+  eprint={2606.01509}, archivePrefix={arXiv}, primaryClass={cs.LG}
+}
+
+% ---------------- General ----------------
+@book{sutton2018reinforcement,
+  title={Reinforcement Learning: An Introduction},
+  author={Sutton, Richard S. and Barto, Andrew G.},
+  edition={2nd},
+  publisher={MIT Press},
+  year={2018}
+}
+@techreport{radford2019language,
+  title={Language Models are Unsupervised Multitask Learners},
+  author={Radford, Alec and Wu, Jeffrey and Child, Rewon and Luan, David and Amodei, Dario and Sutskever, Ilya},
+  institution={OpenAI},
+  year={2019}
+}
+@inproceedings{loshchilov2019decoupled,
+  title={Decoupled Weight Decay Regularization},
+  author={Loshchilov, Ilya and Hutter, Frank},
+  booktitle={International Conference on Learning Representations (ICLR)},
+  year={2019},
+  eprint={1711.05101}, archivePrefix={arXiv}, primaryClass={cs.LG}
+}
+@inproceedings{hoffmann2022training,
+  title={Training Compute-Optimal Large Language Models},
+  author={Hoffmann, Jordan and Borgeaud, Sebastian and Mensch, Arthur and Buchatskaya, Elena and Cai, Trevor and Rutherford, Eliza and others},
+  booktitle={Advances in Neural Information Processing Systems (NeurIPS)},
+  year={2022},
+  eprint={2203.15556}, archivePrefix={arXiv}, primaryClass={cs.CL}
+}
+@inproceedings{kornblith2019similarity,
+  title={Similarity of Neural Network Representations Revisited},
+  author={Kornblith, Simon and Norouzi, Mohammad and Lee, Honglak and Hinton, Geoffrey},
+  booktitle={International Conference on Machine Learning (ICML)},
+  year={2019},
+  eprint={1905.00414}, archivePrefix={arXiv}, primaryClass={cs.LG}
+}
+
+@article{kaplan2020scaling,
+  title={Scaling Laws for Neural Language Models},
+  author={Kaplan, Jared and McCandlish, Sam and Henighan, Tom and Brown, Tom B. and Chess, Benjamin and Child, Rewon and Gray, Scott and Radford, Alec and Wu, Jeffrey and Amodei, Dario},
+  journal={arXiv preprint arXiv:2001.08361},
+  year={2020},
+  eprint={2001.08361}, archivePrefix={arXiv}, primaryClass={cs.LG}
+}
+
+@inproceedings{riquelme2021vmoe,
+  title={Scaling Vision with Sparse Mixture of Experts},
+  author={Riquelme, Carlos and Puigcerver, Joan and Mustafa, Basil and Neumann, Maxim and Jenatton, Rodolphe and Susano Pinto, Andr{\'e} and Keysers, Daniel and Houlsby, Neil},
+  booktitle={Advances in Neural Information Processing Systems (NeurIPS)},
+  volume={34},
+  pages={8583--8595},
+  year={2021},
+  eprint={2106.05974}, archivePrefix={arXiv}, primaryClass={cs.CV}
+}
+
+@inproceedings{mustafa2022limoe,
+  title={Multimodal Contrastive Learning with {LIMoE}: the Language-Image Mixture of Experts},
+  author={Mustafa, Basil and Riquelme, Carlos and Puigcerver, Joan and Jenatton, Rodolphe and Houlsby, Neil},
+  booktitle={Advances in Neural Information Processing Systems (NeurIPS)},
+  volume={35},
+  pages={9564--9576},
+  year={2022},
+  eprint={2206.02770}, archivePrefix={arXiv}, primaryClass={cs.CV}
+}
+
+@article{gu2025elasticmoe,
+  title={Elastic {MoE}: Unlocking the Inference-Time Scalability of Mixture-of-Experts},
+  author={Gu, Naibin and Zhang, Zhenyu and Feng, Yuchen and Chen, Yilong and Fu, Peng and Lin, Zheng and Wang, Shuohuan and Sun, Yu and Wu, Hua and Wang, Weiping and Wang, Haifeng},
+  journal={arXiv preprint arXiv:2509.21892},
+  year={2025},
+  eprint={2509.21892}, archivePrefix={arXiv}, primaryClass={cs.LG}
+}
+
+@article{mohamud2026selfrouting,
+  title={Self-Routing: Parameter-Free Expert Routing from Hidden States},
+  author={Mohamud, Jama Hussein and Wagner, Drew and Ravanelli, Mirco},
+  journal={arXiv preprint arXiv:2604.00421},
+  year={2026},
+  eprint={2604.00421}, archivePrefix={arXiv}, primaryClass={cs.LG}
+}
+
+@inproceedings{engmann2026causal,
+  title={From Observation to Intervention: A Causal Audit of Expert Importance in Mixture-of-Experts Models},
+  author={Engmann, Leonard and Medeiros Adriano, Christian and Giese, Holger},
+  booktitle={ICML 2026 Workshop on Philosophy of Science Meets Machine Learning (PhilML)},
+  note={Non-archival},
+  year={2026},
+  eprint={2606.10703}, archivePrefix={arXiv}, primaryClass={cs.LG}
+}

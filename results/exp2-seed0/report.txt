@@ -1,0 +1,108 @@
+================================================================================================
+MoE ROUTER-COLLAPSE STRATEGY COMPARISON
+================================================================================================
+corpus      : tiny-shakespeare char-level, vocab 65, 1,003,855 train / 111,539 val tokens
+model       : 4L x 128d x 4h, 8 experts top-1, block 128
+routing     : gate_norm=raw, capacity_factor=1.25, lr=0.001, batch 16
+params      : 2,402,688 total, 556,928 active/token (76.8% sparse)
+budget      : equalize=tokens -- 3,000 micro-steps x batch 16 x 128 = 6,144,000 tokens for every strategy; accumulation buys update quality with update count
+device      : cuda   seeds: [0]
+
+------------------------------------------------------------------------------------------------
+QUALITY  (lower is better; evaluated with greedy top-k routing, exploration off)
+------------------------------------------------------------------------------------------------
+strategy         val loss        val ppl   tokens dropped
+none                1.635           5.13           15.79%
+aux                 1.609           5.00            0.37%
+accum               2.220           9.21           27.88%
+surrogate           1.888           6.60           28.51%
+conf                1.610           5.00           13.75%
+threshold           1.619           5.05           19.63%
+
+------------------------------------------------------------------------------------------------
+ROUTER COLLAPSE  (pooled over MoE layers, greedy routing on the held-out set)
+------------------------------------------------------------------------------------------------
+strategy        H_norm↑   max load↓   dead↓
+none              0.969       0.202     0.0
+aux               1.000       0.134     0.0
+accum             0.962       0.206     0.0
+surrogate         0.965       0.194     0.0
+conf              0.973       0.213     0.0
+threshold         0.976       0.200     0.0
+           (perfect balance is H_norm=1.0 and max load=1/8=0.125; 'dead' is pooled, which hides per-layer collapse)
+
+------------------------------------------------------------------------------------------------
+EFFICIENCY  (analytic FLOPs = 2xMACs, backward charged at 2x forward)
+------------------------------------------------------------------------------------------------
+strategy     train TFLOPs   vs top-k   opt steps        tokens   experts/tok
+none                 19.0      0.85x        3000     6,144,000          0.84
+aux                  21.9      0.99x        3000     6,144,000          1.00
+accum                18.5      0.83x         375     6,144,000          0.72
+surrogate            19.2      0.86x        3000     6,144,000          0.71
+conf                 43.4      1.95x        3000     6,144,000          0.86
+threshold            23.7      1.07x        3000     6,144,000          0.91
+           ('experts/tok' is expert evaluations per token at eval, so it sets inference cost. It is k minus whatever
+            capacity dropped -- so below k for any run with a capacity factor. Only a strategy that changes the routing
+            rule itself moves it on its own, and that strategy's trained artefact is then not interchangeable with the
+            others. 'vs top-k' >1.0 prices dense passes, <1.0 means capacity dropped work rather than served it.)
+
+------------------------------------------------------------------------------------------------
+PER-LAYER EXPERT LOAD  (each glyph column is one expert; flat = balanced)
+------------------------------------------------------------------------------------------------
+none  (0. Control: nothing (top-k, no aux loss))
+   L0  |▄▄▄▅▅▅▂▂▂▂▂▂▃▃▃▄▄▄▁▁▁███|  H=0.929 dead=0  max=0.275
+   L1  |▂▂▂▅▅▅▄▄▄▇▇▇███▁▁▁▄▄▄▅▅▅|  H=0.947 dead=0  max=0.219
+   L2  |▃▃▃▁▁▁▃▃▃███▂▂▂▁▁▁▄▄▄▂▂▂|  H=0.914 dead=0  max=0.320
+   L3  |▁▁▁▁▁▁▄▄▄▆▆▆▄▄▄▂▂▂▁▁▁███|  H=0.877 dead=0  max=0.302
+
+aux  (1. Auxiliary load-balancing loss)
+   L0  |▆▆▆██████▇▇▇▆▆▆▆▆▆▇▇▇▅▅▅|  H=0.994 dead=0  max=0.152
+   L1  |███▇▇▇▆▆▆███▇▇▇▇▇▇▇▇▇███|  H=0.998 dead=0  max=0.137
+   L2  |▆▆▆▆▆▆▇▇▇▆▆▆▇▇▇▇▇▇▆▆▆███|  H=0.997 dead=0  max=0.151
+   L3  |▇▇▇███▇▇▇▆▆▆▆▆▆▆▆▆███▇▇▇|  H=0.998 dead=0  max=0.145
+
+accum  (3. Gradient accumulation x8)
+   L0  |   ▂▂▂▅▅▅      ▁▁▁███▃▃▃|  H=0.750 dead=1  max=0.400
+   L1  |▂▂▂▂▂▂▁▁▁▂▂▂███▂▂▂▅▅▅▃▃▃|  H=0.917 dead=0  max=0.306
+   L2  |▆▆▆███▂▂▂▄▄▄▂▂▂         |  H=0.746 dead=3  max=0.360
+   L3  |▁▁▁▃▃▃▂▂▂▁▁▁▇▇▇▁▁▁▇▇▇███|  H=0.860 dead=0  max=0.265
+
+surrogate  (4. Straight-through estimate of the unevaluated experts)
+   L0  |▅▅▅   ███▇▇▇▁▁▁▆▆▆   ███|  H=0.806 dead=2  max=0.229
+   L1  |   ▇▇▇███   ▁▁▁▄▄▄▅▅▅▆▆▆|  H=0.800 dead=2  max=0.259
+   L2  |   ███   ▅▅▅▆▆▆▂▂▂▅▅▅   |  H=0.763 dead=3  max=0.305
+   L3  |▂▂▂      ▅▅▅   ███   ▇▇▇|  H=0.640 dead=4  max=0.375
+
+conf  (5. Dense fallback where the router is not confident)
+   L0  |▁▁▁▂▂▂▁▁▁▁▁▁███▁▁▁▁▁▁▃▃▃|  H=0.788 dead=0  max=0.464
+   L1  |▃▃▃▅▅▅███▂▂▂▅▅▅▁▁▁▄▄▄▃▃▃|  H=0.923 dead=0  max=0.266
+   L2  |▁▁▁▅▅▅▇▇▇███▅▅▅▃▃▃▇▇▇▇▇▇|  H=0.955 dead=0  max=0.186
+   L3  |███▃▃▃██████▅▅▅▅▅▅▃▃▃▄▄▄|  H=0.967 dead=0  max=0.181
+
+threshold  (6. Threshold selection instead of top-k)
+   L0  |▄▄▄▃▃▃▂▂▂▂▂▂▃▃▃███▂▂▂▁▁▁|  H=0.909 dead=0  max=0.322
+   L1  |▁▁▁▆▆▆▁▁▁▁▁▁▁▁▁▁▁▁   ███|  H=0.746 dead=1  max=0.422
+   L2  |▇▇▇▇▇▇▁▁▁▃▃▃▄▄▄▂▂▂███▆▆▆|  H=0.934 dead=0  max=0.214
+   L3  |▄▄▄▁▁▁▆▆▆▁▁▁███▃▃▃▇▇▇▇▇▇|  H=0.917 dead=0  max=0.214
+
+------------------------------------------------------------------------------------------------
+TRAJECTORIES  (columns are % of each strategy's own training budget)
+------------------------------------------------------------------------------------------------
+router balance H_norm (1.0 = perfectly balanced, low = collapsing)
+progress        8%     17%     25%     33%     42%     50%     58%     67%     75%     83%     92%    100%
+none         0.905   0.894   0.912   0.918   0.908   0.928   0.915   0.932   0.925   0.959   0.951   0.969
+aux          0.993   0.993   0.991   0.998   0.998   0.997   0.996   0.996   0.997   0.999   0.999   1.000
+accum        0.734   0.833   0.910   0.916   0.931   0.943   0.943   0.937   0.950   0.952   0.959   0.962
+surrogate    0.890   0.932   0.962   0.969   0.977   0.974   0.960   0.947   0.871   0.914   0.964   0.965
+conf         0.950   0.960   0.935   0.961   0.985   0.891   0.907   0.968   0.963   0.959   0.972   0.973
+threshold    0.986   0.963   0.969   0.970   0.957   0.921   0.956   0.971   0.966   0.965   0.976   0.976
+
+val loss
+progress        8%     17%     25%     33%     42%     50%     58%     67%     75%     83%     92%    100%
+none         2.439   2.277   2.146   1.984   1.888   1.809   1.767   1.730   1.697   1.673   1.647   1.635
+aux          2.432   2.289   2.104   1.970   1.876   1.792   1.747   1.698   1.660   1.645   1.619   1.609
+accum        3.251   2.782   2.547   2.472   2.409   2.366   2.327   2.290   2.267   2.247   2.236   2.220
+surrogate    2.511   2.375   2.276   2.160   2.080   1.997   1.972   1.982   1.934   1.911   1.897   1.888
+conf         2.949   3.676   3.758   3.772   3.516   2.320   1.788   1.700   1.665   1.641   1.622   1.610
+threshold    2.416   2.237   2.037   1.939   1.854   1.772   1.737   1.697   1.670   1.656   1.625   1.619
+================================================================================================
