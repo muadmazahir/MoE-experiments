@@ -2,7 +2,7 @@
 name = "moelab"
 version = "0.1.0"
 description = ""
-authors = ["muad <muad@causalens.com>"]
+authors = ["muad <muadmazahir@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]

@@ -1,4 +1,4 @@
-# MOE-experiments
+# MoE-experiments
 
 Experiments with the MoE architecture. Currently: **six ways to stop a router from
 collapsing**, compared head-to-head.
@@ -6,6 +6,8 @@ collapsing**, compared head-to-head.
 A sparse mixture-of-experts layer, dropped into a small GPT-style transformer, used to
 compare six strategies for keeping the router from collapsing onto a handful of
 experts — measured on **quality**, **router collapse** and **compute**.
+
+A work-in-progress write-up of these experiments is in [paper/main.pdf](paper/main.pdf).
 
 
 ## The problem
@@ -18,41 +20,21 @@ you have to measure the dispatch histogram directly.
 
 ## The six strategies (plus a control)
 
-| key | strategy | how it avoids collapse | aux loss |
-|---|---|---|---|
-| `none` | **control** | nothing | — |
-| `aux` | **1. auxiliary load-balancing loss** | adds `alpha * E * sum_i f_i * P_i` to the task loss, which is minimised when dispatch load `f` and router mass `P` are both uniform | yes |
-| `explore` | **2. epsilon-greedy exploration outside the top-k** | sparse from step 0; a sampled token abandons its whole top-k and is routed to `k` distinct experts drawn from *outside* it, so written-off experts keep getting tried and keep receiving router gradient | no |
-| `accum` | **3. gradient accumulation** | accumulates gradients over many micro-batches before each optimiser step, so each router update is averaged over a large, diverse token population instead of reinforcing whatever one small batch preferred | no |
-| `surrogate` | **4. straight-through estimate of the unevaluated experts** | estimates what the `E - k` skipped experts would have output by fitting "output is proportional to router probability" on the k that ran, and feeds it back straight-through — no forward change, but every router logit gets gradient | no |
-| `conf` | **5. dense fallback where the router is unsure** | a token whose top-k experts hold less than a threshold of the probability mass goes through *every* expert instead, so an undecided token is never forced into a guess the feedback loop would reinforce. The threshold anneals to 0 | no |
-| `threshold` | **6. threshold selection instead of top-k** | selects *every* expert above a probability threshold rather than a fixed k, so the count varies per token. The threshold rises over training, pruning experts the router has earned the right to dismiss | no |
+| key | strategy | how it avoids collapse |
+|---|---|---|
+| `none` | **control** | nothing |
+| `aux` | **1. auxiliary load-balancing loss** | adds `alpha * E * sum_i f_i * P_i` to the task loss, which is minimised when dispatch load `f` and router mass `P` are both uniform |
+| `explore` | **2. epsilon-greedy exploration outside the top-k** | sparse from step 0; a sampled token abandons its whole top-k and is routed to `k` distinct experts drawn from *outside* it, so written-off experts keep getting tried and keep receiving router gradient |
+| `accum` | **3. gradient accumulation** | accumulates gradients over many micro-batches before each optimiser step, so each router update is averaged over a large, diverse token population instead of reinforcing whatever one small batch preferred |
+| `surrogate` | **4. straight-through estimate of the unevaluated experts** | estimates what the `E - k` skipped experts would have output by fitting "output is proportional to router probability" on the k that ran, and feeds it back straight-through — no forward change, but every router logit gets gradient |
+| `conf` | **5. dense fallback where the router is unsure** | a token whose top-k experts hold less than a threshold of the probability mass goes through *every* expert instead, so an undecided token is never forced into a guess the feedback loop would reinforce. The threshold anneals to 0 |
+| `threshold` | **6. threshold selection instead of top-k** | selects *every* expert above a probability threshold rather than a fixed k, so the count varies per token. The threshold rises over training, pruning experts the router has earned the right to dismiss |
 
 Each strategy is written up in **[STRATEGIES.md](STRATEGIES.md)** — the maths,
-and the concerns and open questions for each one. Two knobs there decide whether
+and the concerns and open questions for each one. Measured outcomes across three
+regimes are in **[results/RESULTS.md](results/RESULTS.md)**. Two knobs there decide whether
 collapse is even possible in a given configuration (`--gate-norm` and
 `--capacity-factor`); they are worth reading before interpreting any result.
-
-## Fairness rules
-
-These are enforced in `moelab/train.py`, because most of the ways to get this
-comparison wrong are budgeting mistakes:
-
-- **Identical everything except the strategy** — same architecture, same
-  initialisation seed, same data order, same frozen evaluation set.
-- **The token budget is what's held constant**, not the optimiser-step count. Otherwise
-  gradient accumulation silently gets `accum_steps`x the data and wins for the wrong
-  reason. Run `--equalize steps` to see the other reading, where every strategy takes
-  the same number of updates and the accumulating one consumes proportionally more
-  tokens and FLOPs.
-- **The LR schedule is indexed by token progress**, not step count, so accumulation
-  does not change the shape of the curve.
-- **Everything is evaluated under greedy top-k with exploration off**, because that is
-  how any of them would be deployed. A dense warm-up does not get to be scored in
-  dense mode. The one exception is strategy 6, whose threshold *is* the routing
-  rule rather than a training aid — scoring it under top-k would measure a rule
-  it never trained on. It is therefore the only strategy whose trained artefact
-  is not interchangeable with the others.
 
 ## What is measured
 
@@ -80,8 +62,8 @@ histogram as `H_norm`, so the report prints `H_norm` alone; all three are in
 number of `(token, expert)` evaluations, which is exactly what differs between a dense
 pass (`E` per token) and a top-k pass (`k` per token) — so a strategy that routes some
 or all tokens densely is priced as a real number rather than a hand-wave. Wall-clock is
-recorded in `comparison.json` but kept out of the report, because it is the least
-trustworthy number here (see the note on devices below).
+recorded in `comparison.json` but kept out of the report, because it depends heavily
+on the device and is the least trustworthy number here.
 
 ## Usage
 
@@ -107,38 +89,3 @@ sparse from step 0), `--eps-start`, `--gate-temp`, `--surrogate-alpha`, `--conf-
 
 `d_hidden` is derived as `2 * d_model`; the optimiser settings, `aux_alpha`,
 `accum_steps` and the epsilon anneal endpoints are constants in the source.
-
-### On devices
-
-`--device auto` picks CUDA, then Apple Metal (MPS), then CPU.
-
-**Metal is slower than CPU at this model size, not faster.** Sparse dispatch is a
-handful of tiny `index_select`/`index_add` kernels per expert per layer, plus a host
-sync each layer, so it is launch-latency bound rather than compute bound. Measured
-end to end on `--smoke` (M4 Pro): 51s on MPS against 24s on CPU. The slowdown is also
-uneven across strategies — roughly 1.3x for the plain top-k ones, but 2.1x for `conf`
-and 3.6x for `threshold`, both of which vary the expert count per token and sync more.
-
-That unevenness is the reason not to read anything into `wall_s`. Everything the
-report prints is analytic and device-independent: across the same two runs, training
-FLOPs agreed to three decimal places and validation loss to ~0.002, the residual being
-float rounding flipping the occasional marginal top-k tie.
-
-## Layout
-
-```
-moelab/
-  layers.py       MoELayer: dense, top-k and threshold routing, epsilon-greedy
-                  exploration, the confidence fallback, aux loss, telemetry
-  transformer.py  MoEConfig + MoETransformer — a GPT-style LM with MoE feed-forwards
-  data.py         tiny-shakespeare loading, char tokenisation, seeded batching
-  metrics.py      collapse diagnostics and the analytic FLOP model
-  strategies.py   the seven strategies, each a schedule returning a Phase
-                  (routing mode, epsilon, gate temperature, thresholds)
-  train.py        the shared training/eval harness
-  compare.py      runs everything and formats the report
-run_experiment.py the CLI
-STRATEGIES.md     what each strategy does, the maths, and what is wrong with it
-tests/            correctness tests
-results/          where a run writes its report and per-eval metrics
-```
