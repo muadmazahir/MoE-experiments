@@ -69,10 +69,10 @@ If routing is close to random, every expert sees roughly the same mix of tokens 
 \begin{enumerate}
   \item We describe six strategies for preventing collapse, five of which use no auxiliary loss, with the mathematics of each and an analysis of how each can fail (\cref{sec:methods}).
   \item We compare them in a small, budget-matched testbed across three regimes (\cref{sec:setup,sec:results}). The auxiliary loss is the strongest single method at this scale; the alternatives each carry a useful mechanism and a failure mode, and several failure modes are only visible per layer.
-  \item We lay out the experimental protocol that would actually test the specialisation-and-shrinkage hypothesis, including specialisation metrics and an iso-memory expert-shrinking experiment, together with a compute estimate (\cref{sec:protocol}).
+  \item We set out future work (\cref{sec:protocol}): a framework for measuring specialisation, a framework for checking that a sparser model is as capable as larger, denser ones (including an iso-memory expert-shrinking experiment), how the strategies might be combined and run efficiently on GPUs, and our longer-term aim of letting models learn where to be sparse.
 \end{enumerate}
 
-All experiments are single-seed runs of a 2.4M-parameter model on a 1M-character corpus. They are enough to expose mechanisms and failure modes, but not to rank methods whose quality differs by a few percent, or to test the hypothesis itself. We also do not measure specialisation: every metric we report describes only how evenly load is spread across experts, and measuring specialisation is left to the protocol in \cref{sec:protocol}. We present the experiments as a pilot study.
+All experiments are single-seed runs of a 2.4M-parameter model on a 1M-character corpus. They are enough to expose mechanisms and failure modes, but not to rank methods whose quality differs by a few percent, or to test the hypothesis itself. We also do not measure specialisation: every metric we report describes only how evenly load is spread across experts, and measuring specialisation is left to the evaluation framework in \cref{sec:spec-eval}. We present the experiments as a pilot study.
 
 % ===========================================================================
 \section{Related work}
@@ -102,7 +102,7 @@ so the two differ only in whether the selected probabilities are rescaled. Over 
 \begin{equation}
   f_i = \frac{1}{|\mathcal{A}|}\bigl|\{(t,j)\in\mathcal{A}: j=i\}\bigr|, \qquad \bar p_i = \frac{1}{N}\sum_{t=1}^N p_{t,i}.
 \end{equation}
-An optional capacity factor $\gamma$ limits each expert to $C=\lfloor\gamma|\mathcal{A}|/E\rfloor$ assignments per batch; tokens that overflow skip the expert and pass through the residual connection only \citep{lepikhin2021gshard,fedus2022switch}. Unlike those works, which drop overflow in token order, we drop the lowest-gate assignments first, in the spirit of the batch prioritized routing of \citet{riquelme2021vmoe}.
+An optional capacity factor $\gamma$ limits each expert to $C=\lfloor\gamma|\mathcal{A}|/E\rfloor$ assignments per batch; tokens that overflow skip the expert and pass through the residual connection only \citep{lepikhin2021gshard,fedus2022switch}. Unlike those works, which drop overflow in token order, we drop the lowest-gate assignments first, in the spirit of the batch prioritized routing of \citet{riquelme2021vmoe}. Without a capacity limit, collapse wastes parameters but does not cost accuracy, since every token still reaches its top-$k$. With one, a collapsed router overflows its favourite experts and drops real tokens.
 
 \subsection{Collapse}
 
@@ -121,7 +121,7 @@ Collapse metrics are functions of $f$ (or $\bar p$) alone. They describe how \em
   I(X;\mathcal{E}) \;=\; \underbrace{H(\bar p)}_{\text{balance}} \;-\; \underbrace{\frac{1}{N}\sum_{t=1}^N H(p_t)}_{\text{per-token indecision}} \;\in\; [0,\ \ln E].
   \label{eq:mi}
 \end{equation}
-The first term is maximised by balance. The second is minimised by a router that is decisive about each token. $I(X;\mathcal{E})=\ln E$ is achieved only by a router that is both perfectly balanced and deterministic, i.e.\ one that partitions the inputs into $E$ equal cells; $I=0$ is achieved by any router whose output ignores its input, including uniform-at-random routing. We call a router \emph{specialised} to the extent that $I(X;\mathcal{E})$ is high, and additionally require (\cref{sec:protocol}) that the partition be stable and functionally meaningful, since $I$ alone is also maximised by an arbitrary hash.
+The first term is maximised by balance. The second is minimised by a router that is decisive about each token. $I(X;\mathcal{E})=\ln E$ is achieved only by a router that is both perfectly balanced and deterministic, i.e.\ one that partitions the inputs into $E$ equal cells; $I=0$ is achieved by any router whose output ignores its input, including uniform-at-random routing. We call a router \emph{specialised} to the extent that $I(X;\mathcal{E})$ is high, and additionally require (\cref{sec:spec-eval}) that the partition be stable and functionally meaningful, since $I$ alone is also maximised by an arbitrary hash.
 
 \begin{definition}[Balance and specialisation]
 A router is \emph{balanced} if $H(\bar p)\approx \ln E$ (equivalently $\Hn\approx 1$ for its dispatch) and \emph{specialised} if, in addition, $\frac1N\sum_t H(p_t)\ll\ln E$.
@@ -151,7 +151,7 @@ Each expert in our model has $2dd_h$ parameters, so a layer holds $2Edd_h$ exper
 Let $Q(d_h;\mathcal{R})$ be the quality of an MoE whose experts have width $d_h$, trained with routing procedure $\mathcal{R}$. For routers with low $I(X;\mathcal{E})$, experts receive statistically exchangeable token streams and converge toward redundant generalists, so $Q$ degrades quickly as $d_h$ shrinks. For routers with high and stable $I(X;\mathcal{E})$, each expert need only model a sub-distribution, so $Q$ degrades slowly, and a substantially smaller $E\,d_h$ attains the same quality.
 \end{hypothesis}
 
-The intuition is a mixture-of-regressions argument: if the target function restricted to cell $\mathcal{X}_i$ has lower complexity than on all of $\mathcal{X}$, an expert that only sees $\mathcal{X}_i$ needs fewer parameters to fit it. Indirect support comes from compression results: that experts can be merged \citep{li2024mcsmoe} or pruned \citep{lu2024notall} with limited loss implies that trained experts overlap substantially, which is what \cref{hyp:shrink} predicts for weakly specialised routing. We stress that \cref{hyp:shrink} is \emph{untested} here; testing it is the purpose of the protocol in \cref{sec:protocol}.
+The intuition is a mixture-of-regressions argument: if the target function restricted to cell $\mathcal{X}_i$ has lower complexity than on all of $\mathcal{X}$, an expert that only sees $\mathcal{X}_i$ needs fewer parameters to fit it. Indirect support comes from compression results: that experts can be merged \citep{li2024mcsmoe} or pruned \citep{lu2024notall} with limited loss implies that trained experts overlap substantially, which is what \cref{hyp:shrink} predicts for weakly specialised routing. We stress that \cref{hyp:shrink} is \emph{untested} here; testing it is the purpose of the experiments in \cref{sec:capability}.
 
 % ===========================================================================
 \section{Strategies for preventing collapse}
@@ -224,12 +224,6 @@ Instead of always taking exactly $k$ experts, this strategy takes every expert w
 The threshold is set relative to an even split. $1/E$ is the probability each expert would get if the router spread its probability evenly, and the threshold is $\tau$ times that. $\tau$ rises from $\tau_0=1$ to $\tau_1=1.6$ over the first 80\% of training, so with $E=8$ the threshold rises from $0.125$ to $0.2$. A confident token therefore keeps one expert, while an unsure one keeps several.
 Renormalising over a single selected expert gives the constant gate $1$ and a zero router gradient, so the gate falls back per token to $g_i=p_i$ whenever $|\mathcal{S}(x)|=1$. The threshold range was calibrated from the trained router's measured probabilities (top-1, 2, 3 masses of roughly $0.39, 0.17, 0.12$ at $E=8$); an absolute threshold near $0.5$ cannot work because at most one expert can exceed it. This is a sharpening rule, and the only strategy whose mechanism could plausibly \emph{worsen} collapse: an expert that falls behind clears the bar for fewer tokens. It is also the only one whose routing rule stays in force at evaluation, so its inference cost varies per token. It is closely related to top-$p$ routing \citep{huang2024harder} and to ReLU routing \citep{wang2025remoe}.
 
-\subsection{Two configuration choices that decide whether collapse is possible}
-\label{sec:knobs}
-\emph{Gate normalisation.} The renormalised gate expresses only relative preference among the chosen experts and removes much of the rich-get-richer pressure by construction. At $k=1$ it is a softmax over a single number, the constant $1$, so the router receives \emph{no task gradient} and never trains; a frozen router looks perfectly balanced. We use the raw gate at $k=1$.
-
-\emph{Capacity factor.} With no capacity limit, collapse wastes parameters but does not cost accuracy, since every token still reaches its top-$k$. A capacity factor couples the two: a collapsed router overflows its favourite experts and drops real tokens. It is also itself an anti-collapse force (\cref{sec:cross}).
-
 % ===========================================================================
 \section{Experimental setup}
 \label{sec:setup}
@@ -244,7 +238,7 @@ Every strategy shares architecture, initialisation seed, data order and a frozen
 Quality is validation cross-entropy and the share of assignments dropped for capacity \citep{fedus2022switch}. Collapse is $\Hn$, max load and dead experts, pooled and per layer, from the held-out dispatch histogram. Compute is analytic, following the accounting of \citet{kaplan2020scaling} and \citet{hoffmann2022training}: FLOPs are $2\times$ MACs, backward is charged at $2\times$ forward, and expert cost is driven by the \emph{measured} number of (token, expert) evaluations, so dense or variable-$k$ routing is priced exactly.
 
 \paragraph{Regimes.}
-\textbf{Exp.~1:} top-2, renormalised gate, $\gamma=1.25$, 3{,}000 steps of batch 32 (12.3M tokens per strategy). \textbf{Exp.~2:} top-1, raw gate, $\gamma=1.25$, learning rate $10^{-3}$, batch 16, 3{,}000 steps. This is the Switch-style regime, in which collapse has room to run. \code{explore} is excluded as it requires $k\ge2$. \textbf{Exp.~3:} as Exp.~1 but with 1{,}000 optimiser steps for every strategy, so \code{accum} consumes $8\times$ the tokens. All runs use seed 0 on a single T4 GPU (about one hour in total).
+\textbf{Exp.~1:} top-2, renormalised gate, $\gamma=1.25$, 3{,}000 steps of batch 32 (12.3M tokens per strategy). \textbf{Exp.~2:} top-1, raw gate, $\gamma=1.25$, learning rate $10^{-3}$, batch 16, 3{,}000 steps. This is the Switch-style regime, in which collapse has room to run. We use the raw gate because at $k=1$ the renormalised gate is always exactly 1, so the router would receive no task gradient and never train. \code{explore} is excluded as it requires $k\ge2$. \textbf{Exp.~3:} as Exp.~1 but with 1{,}000 optimiser steps for every strategy, so \code{accum} consumes $8\times$ the tokens. All runs use seed 0 on a single T4 GPU (about one hour in total).
 
 % ===========================================================================
 \section{Results}
@@ -370,12 +364,16 @@ The random-routing results also admit a reading that cuts against our hypothesis
 All results come from one seed, one 2.4M-parameter model, one small homogeneous character-level corpus, and at most 3{,}000 optimiser steps per run. Quality differences of a few percent of perplexity are not significant. Hyper-parameters of every strategy, including $\alpha$, are untuned. We measure balance, not specialisation, and the shrinkage hypothesis is argued, not demonstrated. Compute is reported analytically and excludes dispatch overheads that matter in practice. Our argument in \cref{sec:balance-spec} concerns the routers that minimise the loss; it does not claim that auxiliary-loss training \emph{converges} to random routing, only that the loss provides no pressure away from it.
 
 % ===========================================================================
-\section{A protocol for testing specialisation and shrinkage}
+\section{Future work}
 \label{sec:protocol}
 
-We describe the experiment we would run with adequate compute. Its purpose is to test \cref{hyp:shrink} directly and to rank strategies on specialisation, not only on balance.
+This section sets out what we would do next with adequate compute. The first two subsections describe the evaluation the next experiments need: a framework for measuring specialisation, and a framework for checking that a sparser, more efficient model is as capable as a larger, denser one. The rest cover the ablations our pilot flagged, how the strategies might be combined, ways to stop a few experts from being over-trained, whether the strategies run efficiently on GPUs, and our longer-term aim of letting models learn where to be sparse.
 
-\subsection{Scale and data}
+\subsection{A framework for evaluating specialisation}
+\label{sec:spec-eval}
+Its purpose is to rank strategies on specialisation, not only on balance, and to provide the measurements that the shrinkage experiment (\cref{sec:capability}) needs to test \cref{hyp:shrink}.
+
+\paragraph{Scale and data.}
 \begin{itemize}
   \item \textbf{Tokenisation and corpus.} Subword tokens on a large, \emph{domain-labelled} mixture (e.g.\ web text, code, mathematics, several natural languages), so that specialisation has something to latch onto and can be measured against ground-truth domains. Character-level Shakespeare is too homogeneous for domain specialisation to exist.
   \item \textbf{Two model scales.} A sweep scale of roughly 100--150M active parameters trained near the compute-optimal token count \citep{hoffmann2022training} ($\sim$2--3B tokens), and a confirmation scale of about 1B active parameters for the best three configurations. Collapse and specialisation are both known to change with scale and training length, and our 3{,}000-step runs are far from either regime.
@@ -383,11 +381,9 @@ We describe the experiment we would run with adequate compute. Its purpose is to
   \item \textbf{Seeds.} At least three per configuration, reporting mean and standard deviation; single-seed rankings in our tables should not be trusted.
 \end{itemize}
 
-\subsection{Baselines}
-In addition to our seven configurations: global-batch auxiliary loss \citep{qiu2025demons}; auxiliary-loss-free bias balancing \citep{wang2024auxfree}; Default MoE dense backpropagation \citep{panda2025dense}; expert-choice routing \citep{zhou2022expertchoice}; a frozen random-hash router \citep{roller2021hash}, which is the \emph{null model for specialisation}: any method whose specialisation metrics do not beat it has not learned to route; and a dense model of equal active parameters.
+\paragraph{Baselines.} In addition to our seven configurations: global-batch auxiliary loss \citep{qiu2025demons}; auxiliary-loss-free bias balancing \citep{wang2024auxfree}; Default MoE dense backpropagation \citep{panda2025dense}; expert-choice routing \citep{zhou2022expertchoice}; a frozen random-hash router \citep{roller2021hash}, which is the \emph{null model for specialisation}: any method whose specialisation metrics do not beat it has not learned to route.
 
-\subsection{Specialisation metrics}
-All computed per layer on held-out data:
+\paragraph{Specialisation metrics.} All computed per layer on held-out data:
 \begin{enumerate}
   \item \textbf{Token--expert mutual information} $I(X;\mathcal{E})$ from \eqref{eq:mi}, split into its balance and per-token-entropy terms, normalised by $\ln E$.
   \item \textbf{Domain--expert mutual information} $I(D;\mathcal{E})$ \citep{gu2025elasticmoe} using the corpus's domain labels, together with per-domain dispatch histograms in the style of \citet{muennighoff2025olmoe}.
@@ -397,9 +393,19 @@ All computed per layer on held-out data:
   \item \textbf{Collapse metrics} as in this paper, always per layer, with max load reported alongside $\Hn$.
 \end{enumerate}
 
-\subsection{The shrinkage experiment}
+\subsection{A framework for evaluating capability against larger, denser models}
+\label{sec:capability}
+The aim is a model that is sparser and more efficient than a standard MoE or a dense model of similar quality, while being just as capable. Showing this needs two things: the shrinkage experiment, and a comparison against larger and denser models on capability, not just loss.
+
+\paragraph{The shrinkage experiment.}
 \label{sec:shrinkage}
 The decisive test of \cref{hyp:shrink}. For each routing procedure $\mathcal{R}$, train models whose expert width is $d_h/r$ for $r\in\{1,2,4,8\}$, holding $E$, $k$, the backbone and the token budget fixed, and plot validation loss against total expert parameters $E\,d_h/r$. The hypothesis predicts that the loss-versus-memory curve is flatter for procedures with higher measured specialisation. Two complementary controls: (i) at fixed \emph{active} compute, reduce $E$ instead of $d_h$, to separate ``fewer experts'' from ``smaller experts''; and (ii) apply post-hoc merging \citep{li2024mcsmoe} and pruning \citep{lu2024notall} to the $r=1$ models, measuring how much each procedure's experts can be compressed after training. If specialised routing yields experts that compress \emph{less} post hoc but can be trained \emph{smaller} a priori, that is strong evidence for the hypothesis.
+
+\paragraph{Comparison models.} Each routing method is compared against three models of the same backbone: a dense model with the same active parameters (the same compute per token), a dense model with the same total parameters (the same memory), and a standard MoE of the same size trained with the auxiliary loss. Every model is trained on the same data for the same number of tokens.
+
+\paragraph{Capability benchmarks.} A lower validation loss does not by itself show that a routing method gives a more capable model. Each model should also be scored on downstream benchmarks, using a standard harness \citep{gao2024harness} so that results can be compared with published numbers. At the sweep scale many benchmarks sit near chance, so we would use ones that small models can do: HellaSwag \citep{zellers2019hellaswag}, PIQA \citep{bisk2020piqa}, ARC-Easy \citep{clark2018arc}, LAMBADA \citep{paperno2016lambada} and WinoGrande \citep{sakaguchi2020winogrande}. At the confirmation scale we would add harder ones: MMLU \citep{hendrycks2021mmlu}, GSM8K \citep{cobbe2021gsm8k} and HumanEval \citep{chen2021codex}. Validation loss should also be reported separately for each domain of the corpus, since a specialised model may gain on some domains and lose on others.
+
+Running the experiments in \cref{sec:spec-eval} and this section at the scales above would take on the order of a few thousand A100 GPU-hours, far beyond the budget of our pilot.
 
 \subsection{Ablations that our pilot flagged}
 \begin{itemize}
@@ -410,16 +416,37 @@ The decisive test of \cref{hyp:shrink}. For each routing procedure $\mathcal{R}$
   \item With and without capacity factor, since the limit itself suppresses collapse.
 \end{itemize}
 
-\subsection{Compute estimate}
-Using the $6ND$ approximation \citep{kaplan2020scaling} with $N$ active parameters, a 125M-active model trained on 2.5B tokens costs about $1.9\times10^{18}$ FLOPs; at an effective $10^{14}$~FLOP/s on one A100 (roughly 30\% utilisation, discounted further for MoE dispatch overhead), that is about 5--10 GPU-hours per run. The sweep (ten routing procedures, four expert widths, three seeds) is 120 runs, or on the order of 1{,}000 GPU-hours. The confirmation scale ($\sim$1B active parameters, 20B tokens, $\sim1.2\times10^{20}$ FLOPs per run) for three configurations and two seeds adds on the order of 2{,}000 GPU-hours. The full protocol is therefore in the low thousands of A100-hours: modest for an industrial lab, well beyond the budget used for the pilot.
-
 \subsection{Toward a combined method}
 \label{sec:combined}
-No single strategy we tested produces routers that are both balanced and specialised, and we do not expect one to. A method that gets experts to specialise properly will most likely need to combine several of the strategies covered here, and possibly others we have not tested, such as an explicit reward for decisive routing. Designing that combination is the natural next step once the protocol above can measure specialisation.
+No single strategy we tested produces routers that are both balanced and specialised, and we do not expect one to. A method that gets experts to specialise properly will most likely need to combine several of the strategies covered here, and possibly others we have not tested, such as an explicit reward for decisive routing. Designing that combination is the natural next step once the framework in \cref{sec:spec-eval} can measure specialisation.
+
+\subsection{Stopping a few experts from being over-trained}
+\label{sec:clipping}
+One idea worth testing is to stop a few experts from being trained far more than the rest. Each expert's gradient grows with the number of tokens routed to it, so a popular expert gets larger updates, gets better and attracts even more tokens. Clipping is a natural way to break this loop, and there are several things that could be clipped. Each expert's gradient could be clipped separately, instead of the single global clip we use (\cref{tab:train}). The router logits could be soft-capped, $z\leftarrow c\tanh(z/c)$, as Gemma~2 does for its attention and output logits \citep{gemmateam2024gemma2}. This bounds the gap between any two of a token's logits by $2c$, so no expert's probability can fall too far below the top expert's. Or the router's updates could be clipped as in PPO \citep{schulman2017ppo}, so that no routing probability can change by more than a factor of $1\pm\epsilon$ in one step. This slows collapse rather than ruling it out, but it gives the balancing mechanism time to react. A softer option than capping the logits is a \emph{spread penalty} on each token's logits,
+\begin{equation}
+  \mathcal{L}_{\text{spread}} = \frac{1}{N}\sum_{t=1}^N\sum_{i=1}^E\bigl(z_{t,i}-\bar z_t\bigr)^2, \qquad \bar z_t = \frac{1}{E}\sum_{i=1}^E z_{t,i}.
+\end{equation}
+Like the softmax, it ignores a constant added to all of a token's logits, so it measures only the gaps that decide routing. None of these can revive an expert that receives no tokens, since its gradient is already zero. Limiting the gaps between logits also makes each token's routing more even, which works against decisive routing. So these would need to be combined with the other mechanisms and used with mild settings.
+
+\subsection{Efficiency on real hardware}
+\label{sec:hardware}
+Finding out whether a strategy works in principle is worthwhile in itself. But for a strategy to be used, it also has to run efficiently on the hardware models are trained on, which today means GPUs. Our compute figures are analytic FLOP counts (\cref{sec:limitations}), and FLOPs are a poor guide to speed on GPUs, which run fastest on large matrix multiplications of fixed shape. MoE training already relies on specialised kernels, and on spreading experts across devices with all-to-all communication to send each token to its experts \citep{lepikhin2021gshard,rajbhandari2022deepspeedmoe,gale2023megablocks}. Some of our strategies make this harder. \code{conf} sends some tokens to every expert, so the amount of work changes from step to step, and each dense token costs $E/k$ times a sparse one. Our implementation also has to wait for the GPU at every step to count the dense tokens. \code{threshold} gives each token a different number of experts, which makes expert loads uneven and the shapes of the matrix multiplications unpredictable. PPO-style clipping of router updates (\cref{sec:clipping}) needs the previous router's probabilities to be stored or recomputed. Others are cheap: \code{surrogate} adds no expert computation, only extra router gradients, and balancing over the global batch only needs expert counts shared across devices. The protocol should therefore measure wall-clock time, throughput and memory on GPUs, with experts spread across several devices, alongside the analytic FLOPs. A strategy that needs fewer FLOPs but runs slower in practice has not saved compute.
+
+\subsection{Letting models learn where to be sparse}
+\label{sec:future}
+If a combined method (\cref{sec:combined}) does produce routers that are both balanced and specialised, the next step we want to focus on is conditional computation that the model learns for itself, which is our longer-term aim.
+
+Even a well-trained MoE is a hand-designed form of conditional computation. We decide in advance where routing happens, how many experts there are, and how many of them each token may use. A recurring lesson in deep learning is that structure learned from data tends to beat structure fixed by hand \citep{sutton2019bitter}. It would therefore be better to let the model learn when and where to compute conditionally. We call this \emph{distributional} conditional computation, in contrast to the \emph{symbolic} conditional computation of a fixed MoE layout.
+
+ReLU networks already do a simple version of this, since many units are inactive for any given input. But this sparsity is scattered across the network, so current hardware cannot easily turn it into savings: GPUs need whole blocks of work to be skipped, not individual units (\cref{sec:hardware}). The question is whether models can be trained so that their sparsity is structured and regional, with whole regions of the network switching on or off together, much as different areas of the brain are active during different tasks. We see two ways to approach this.
+
+\paragraph{Building on existing mechanisms.} The first is to start from mechanisms that already produce sparsity, such as ReLU activations or ReLU-based routing \citep{wang2025remoe}, and adjust training so that the sparsity they produce is regional and therefore cheap to exploit. Theories of learning dynamics may help here. \citet{jarvis2025makehaste} show that ReLU networks can be analysed as gated deep linear networks, and that feature learning has an implicit bias towards structured representations that reuse the same units across contexts. This suggests that gating patterns are not arbitrary and can be predicted from how the network learns. We want to find out whether this kind of analysis can tell us how to shape training so that learned sparsity becomes regional.
+
+\paragraph{Changing how discrete choices are learned.} The second is to change the training algorithm itself. Conditional computation means making discrete decisions, such as which experts or units to use. These decisions are not differentiable, so backpropagation handles them poorly. Current methods rely on workarounds, such as scaling each expert's output by its gate (\cref{eq:gates}) or straight-through estimates (\cref{sec:surrogate}), and these have problems of their own. Recent work suggests that gradient-free and hybrid optimisers can now train large models. For example, EGGROLL \citep{sarkar2025eggroll} makes evolution strategies about a hundred times faster for billion-parameter models by using low-rank perturbations. Methods like this do not need the routing decision to be differentiable at all. We want to compare them with gradient estimators for training discrete routing, and to find out whether a theory of learning dynamics can explain when gradient estimators fail and when gradient-free or hybrid methods should be preferred.
 
 % ===========================================================================
 \section{Conclusion}
-Preventing router collapse and producing specialised experts are different objectives. The standard auxiliary loss is an effective answer to the first, and in our pilot the most effective one, but it is provably indifferent to the second. Specialisation is what would let each expert be smaller and would attack the memory cost that defines MoE deployment. We have described six mechanisms for preventing collapse, characterised where each helps and fails, argued that getting experts to specialise will likely require combining several of them, and set out the experiment that would test whether specialised routers really allow smaller experts. The code for every experiment in this paper is available at \url{https://github.com/muadmazahir/MoE-experiments}, so that the protocol can be run by anyone with the compute to do so.
+Preventing router collapse and producing specialised experts are different objectives. The standard auxiliary loss is an effective answer to the first, and in our pilot the most effective one, but it is provably indifferent to the second. Specialisation is what would let each expert be smaller and would attack the memory cost that defines MoE deployment. We have described six mechanisms for preventing collapse, characterised where each helps and fails, argued that getting experts to specialise will likely require combining several of them, and set out the experiment that would test whether specialised routers really allow smaller experts. Beyond that, our longer-term aim is conditional computation that the model learns for itself rather than one we design by hand (\cref{sec:future}). The code for every experiment in this paper is available at \url{https://github.com/muadmazahir/MoE-experiments}, so that the protocol can be run by anyone with the compute to do so.
 
 \bibliographystyle{plainnat}
 \bibliography{refs}
